@@ -114,11 +114,15 @@ export default function AIAdoptionProcess() {
     // Check if we're in the section
     const isInSection = rect.top < 100 && rect.bottom > 100;
     
-    if (isInSection && !isHorizontalMode) {
-      // Enter horizontal mode
-      setIsHorizontalMode(true);
+    if (isInSection) {
+      // Prevent ALL scrolling when in horizontal mode
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
+      
+      if (!isHorizontalMode) {
+        setIsHorizontalMode(true);
+      }
       
       isScrollingRef.current = true;
       const content = contentRef.current;
@@ -146,17 +150,9 @@ export default function AIAdoptionProcess() {
       setTimeout(() => {
         isScrollingRef.current = false;
       }, 500);
-    } else if (!isInSection && isHorizontalMode) {
-      // Exit horizontal mode
+    } else if (isHorizontalMode) {
+      // Exit horizontal mode when not in section
       setIsHorizontalMode(false);
-    }
-  }, [isHorizontalMode]);
-
-  const handleGlobalWheel = useCallback((e: WheelEvent) => {
-    // If we're in horizontal mode, prevent all vertical scrolling
-    if (isHorizontalMode) {
-      e.preventDefault();
-      e.stopPropagation();
     }
   }, [isHorizontalMode]);
 
@@ -164,16 +160,19 @@ export default function AIAdoptionProcess() {
     const content = contentRef.current;
     if (!content) return;
 
+    // Override global scroll behavior for this component
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+
     content.addEventListener('scroll', handleScroll);
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    document.addEventListener('wheel', handleGlobalWheel, { passive: false });
+    document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
     
     return () => {
       content.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-      document.removeEventListener('wheel', handleGlobalWheel);
+      document.removeEventListener('wheel', handleWheel, { capture: true });
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
     };
-  }, [handleScroll, handleWheel, handleGlobalWheel]);
+  }, [handleScroll, handleWheel]);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
