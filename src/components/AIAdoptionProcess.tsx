@@ -1,13 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger plugin
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 interface Stage {
   id: number;
@@ -72,286 +65,247 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    if (!sectionRef.current || !contentRef.current) return;
-
-    const section = sectionRef.current;
-    const content = contentRef.current;
-    const stageElements = stageRefs.current.filter(Boolean);
-
-    // Calculate the total width of all stages
-    const totalWidth = stageElements.reduce((sum, stage) => sum + stage.offsetWidth, 0);
-    const viewportWidth = window.innerWidth;
-    const scrollDistance = totalWidth - viewportWidth;
-
-    // Create GSAP ScrollTrigger for horizontal scrolling
-    const horizontalScroll = gsap.to(content, {
-      x: -scrollDistance,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        pin: true,
-        start: 'top top',
-        end: () => `+=${scrollDistance}`,
-        scrub: 1,
-        onUpdate: (self) => {
-          // Calculate which stage is currently active based on scroll progress
-          const progress = self.progress;
-          const stageIndex = Math.floor(progress * stages.length);
-          const newActiveStage = Math.min(stageIndex + 1, stages.length);
-          setActiveStage(newActiveStage);
-        }
-      }
-    });
-
-    // Cleanup function
-    return () => {
-      horizontalScroll.kill();
-      ScrollTrigger.getAll().forEach(trigger => {
-        if (trigger.trigger === section) {
-          trigger.kill();
-        }
-      });
-    };
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollToStage = (stageId: number) => {
-    if (!sectionRef.current || !contentRef.current) return;
-
-    const section = sectionRef.current;
-    const content = contentRef.current;
-    const stageElements = stageRefs.current.filter(Boolean);
+    if (!containerRef.current) return;
     
-    // Calculate the total width and target position
-    const totalWidth = stageElements.reduce((sum, stage) => sum + stage.offsetWidth, 0);
-    const viewportWidth = window.innerWidth;
-    const scrollDistance = totalWidth - viewportWidth;
-    
-    // Calculate target scroll position
-    const targetProgress = (stageId - 1) / (stages.length - 1);
-    const targetScrollY = section.offsetTop + (targetProgress * scrollDistance);
-    
-    window.scrollTo({
-      top: targetScrollY,
-      behavior: 'smooth'
-    });
+    const stageElement = containerRef.current.children[stageId - 1] as HTMLElement;
+    if (stageElement) {
+      stageElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start'
+      });
+    }
   };
 
+  const handleScroll = () => {
+    if (!containerRef.current) return;
+    
+    const container = containerRef.current;
+    const scrollLeft = container.scrollLeft;
+    const containerWidth = container.clientWidth;
+    
+    // Calculate which stage is currently visible
+    const stageIndex = Math.round(scrollLeft / containerWidth);
+    const newActiveStage = Math.min(stageIndex + 1, stages.length);
+    setActiveStage(newActiveStage);
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section 
-      ref={sectionRef}
-      className="py-24 bg-white relative"
-      id="ai-adoption-process"
-    >
-      {/* Sticky Container */}
-      <div className="sticky top-0 h-screen flex items-center">
-        <div className="w-full">
-          {/* Header */}
-          <div className="text-center mb-16 px-6">
-            <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
-              Our 5-Stage AI Adoption <span style={{ color: '#595F39' }}>Process</span>
-            </h2>
-            <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
-              Transform your business with AI before your competitors do. Our proven methodology delivers measurable results, 
-              competitive advantage, and future-ready operations that scale with your growth.
-            </p>
-          </div>
+    <section className="py-24 bg-white relative" id="ai-adoption-process">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
+            Our 5-Stage AI Adoption <span style={{ color: '#595F39' }}>Process</span>
+          </h2>
+          <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
+            Transform your business with AI before your competitors do. Our proven methodology delivers measurable results, 
+            competitive advantage, and future-ready operations that scale with your growth.
+          </p>
+        </div>
 
-          {/* Timeline */}
-          <div className="mb-16">
-            {/* Progress */}
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
-                <span className="text-sm font-medium text-gray-600">
-                  Stage {activeStage} of 5
-                </span>
-                <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full rounded-full transition-all duration-300"
-                    style={{ 
-                      width: `${(activeStage / 5) * 100}%`,
-                      backgroundColor: '#595F39'
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Timeline Nodes */}
-            <div className="flex justify-center">
-              <div className="flex items-center space-x-8">
-                {stages.map((stage) => (
-                  <button
-                    key={stage.id}
-                    onClick={() => scrollToStage(stage.id)}
-                    className="flex flex-col items-center group cursor-pointer"
-                  >
-                    <div
-                      className={`
-                        w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
-                        ${activeStage === stage.id ? 'scale-110 shadow-lg' : 'hover:scale-105'}
-                      `}
-                      style={{
-                        backgroundColor: activeStage === stage.id ? '#595F39' : '#E5E7EB',
-                        color: activeStage === stage.id ? 'white' : '#6B7280'
-                      }}
-                    >
-                      {stage.id}
-                    </div>
-                    <span className={`
-                      mt-3 text-sm font-medium transition-colors duration-300
-                      ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
-                    `}>
-                      {stage.label}
-                    </span>
-                    <span 
-                      className="px-2 py-1 text-xs font-medium rounded-full mt-1"
-                      style={{
-                        backgroundColor: activeStage === stage.id ? '#595F39' : '#9C8B5E',
-                        color: 'white',
-                        opacity: activeStage === stage.id ? 1 : 0.8
-                      }}
-                    >
-                      {stage.timeline}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="relative overflow-hidden">
-            <div 
-              ref={contentRef}
-              className="flex"
-              style={{ width: 'fit-content' }}
-            >
-              {stages.map((stage, index) => (
+        {/* Timeline */}
+        <div className="mb-16">
+          {/* Progress */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
+              <span className="text-sm font-medium text-gray-600">
+                Stage {activeStage} of 5
+              </span>
+              <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                 <div 
-                  key={stage.id}
-                  ref={(el) => (stageRefs.current[index] = el)}
-                  className="w-screen flex-shrink-0 px-6 pb-8"
-                >
-                  <div className="max-w-6xl mx-auto">
-                    <div className="grid lg:grid-cols-2 gap-12 items-start">
-                      {/* Left Side */}
-                      <div className="space-y-8">
-                        <div>
-                          <h3 className="text-3xl font-medium text-gray-900 mb-4">
-                            {stage.label}
-                          </h3>
-                          <p className="text-lg text-gray-600 font-light leading-relaxed">
-                            {stage.purpose}
-                          </p>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-2xl p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                              Timeline
-                            </span>
-                            <span 
-                              className="px-3 py-1 text-sm font-medium rounded-full"
-                              style={{
-                                backgroundColor: '#9C8B5E',
-                                color: 'white'
-                              }}
-                            >
-                              {stage.timeline}
-                            </span>
-                          </div>
-                          <div className="space-y-3">
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#595F39' }} />
-                              <span className="text-sm text-gray-600">
-                                {stage.weDo.length} key activities
-                              </span>
-                            </div>
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#9C8B5E' }} />
-                              <span className="text-sm text-gray-600">
-                                {stage.youGet.length} deliverables
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right Side */}
-                      <div className="space-y-8">
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
-                            <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                            We Do
-                          </h4>
-                          <div className="space-y-3">
-                            {stage.weDo.map((item, itemIndex) => (
-                              <p key={itemIndex} className="text-gray-600 leading-relaxed font-light">
-                                {item}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
-                            <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
-                            You Get
-                          </h4>
-                          <div className="flex flex-wrap gap-2">
-                            {stage.youGet.map((item, itemIndex) => (
-                              <span
-                                key={itemIndex}
-                                className="px-3 py-1 text-sm rounded-full font-medium"
-                                style={{
-                                  backgroundColor: '#9C8B5E20',
-                                  color: '#9C8B5E'
-                                }}
-                              >
-                                {item}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
-                            <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                            Success Looks Like
-                          </h4>
-                          <p className="text-gray-600 leading-relaxed font-light">
-                            {stage.successLooksLike}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${(activeStage / 5) * 100}%`,
+                    backgroundColor: '#595F39'
+                  }}
+                />
+              </div>
             </div>
+          </div>
 
-            {/* Scroll Indicators */}
-            <div className="flex justify-center mt-8 space-x-2">
+          {/* Timeline Nodes */}
+          <div className="flex justify-center">
+            <div className="flex items-center space-x-8">
               {stages.map((stage) => (
                 <button
                   key={stage.id}
                   onClick={() => scrollToStage(stage.id)}
-                  className={`
-                    w-3 h-3 rounded-full transition-all duration-300
-                    ${activeStage === stage.id ? 'scale-125' : 'hover:scale-110'}
-                  `}
-                  style={{
-                    backgroundColor: activeStage === stage.id ? '#595F39' : '#D1D5DB'
-                  }}
-                />
+                  className="flex flex-col items-center group cursor-pointer"
+                >
+                  <div
+                    className={`
+                      w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
+                      ${activeStage === stage.id ? 'scale-110 shadow-lg' : 'hover:scale-105'}
+                    `}
+                    style={{
+                      backgroundColor: activeStage === stage.id ? '#595F39' : '#E5E7EB',
+                      color: activeStage === stage.id ? 'white' : '#6B7280'
+                    }}
+                  >
+                    {stage.id}
+                  </div>
+                  <span className={`
+                    mt-3 text-sm font-medium transition-colors duration-300
+                    ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
+                  `}>
+                    {stage.label}
+                  </span>
+                  <span 
+                    className="px-2 py-1 text-xs font-medium rounded-full mt-1"
+                    style={{
+                      backgroundColor: activeStage === stage.id ? '#595F39' : '#9C8B5E',
+                      color: 'white',
+                      opacity: activeStage === stage.id ? 1 : 0.8
+                    }}
+                  >
+                    {stage.timeline}
+                  </span>
+                </button>
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Horizontal Scroll Container */}
+        <div 
+          ref={containerRef}
+          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+          style={{ 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none',
+            scrollBehavior: 'smooth'
+          }}
+        >
+          {stages.map((stage) => (
+            <div 
+              key={stage.id}
+              className="w-full flex-shrink-0 snap-start px-6"
+            >
+              <div className="max-w-6xl mx-auto">
+                <div className="grid lg:grid-cols-2 gap-12 items-start">
+                  {/* Left Side */}
+                  <div className="space-y-8">
+                    <div>
+                      <h3 className="text-3xl font-medium text-gray-900 mb-4">
+                        {stage.label}
+                      </h3>
+                      <p className="text-lg text-gray-600 font-light leading-relaxed">
+                        {stage.purpose}
+                      </p>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-2xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                          Timeline
+                        </span>
+                        <span 
+                          className="px-3 py-1 text-sm font-medium rounded-full"
+                          style={{
+                            backgroundColor: '#9C8B5E',
+                            color: 'white'
+                          }}
+                        >
+                          {stage.timeline}
+                        </span>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#595F39' }} />
+                          <span className="text-sm text-gray-600">
+                            {stage.weDo.length} key activities
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#9C8B5E' }} />
+                          <span className="text-sm text-gray-600">
+                            {stage.youGet.length} deliverables
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Side */}
+                  <div className="space-y-8">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
+                        <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
+                        We Do
+                      </h4>
+                      <div className="space-y-3">
+                        {stage.weDo.map((item, itemIndex) => (
+                          <p key={itemIndex} className="text-gray-600 leading-relaxed font-light">
+                            {item}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
+                        <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
+                        You Get
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {stage.youGet.map((item, itemIndex) => (
+                          <span
+                            key={itemIndex}
+                            className="px-3 py-1 text-sm rounded-full font-medium"
+                            style={{
+                              backgroundColor: '#9C8B5E20',
+                              color: '#9C8B5E'
+                            }}
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
+                        <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
+                        Success Looks Like
+                      </h4>
+                      <p className="text-gray-600 leading-relaxed font-light">
+                        {stage.successLooksLike}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Scroll Indicators */}
+        <div className="flex justify-center mt-8 space-x-2">
+          {stages.map((stage) => (
+            <button
+              key={stage.id}
+              onClick={() => scrollToStage(stage.id)}
+              className={`
+                w-3 h-3 rounded-full transition-all duration-300
+                ${activeStage === stage.id ? 'scale-125' : 'hover:scale-110'}
+              `}
+              style={{
+                backgroundColor: activeStage === stage.id ? '#595F39' : '#D1D5DB'
+              }}
+            />
+          ))}
         </div>
       </div>
     </section>
