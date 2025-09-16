@@ -69,6 +69,7 @@ export default function AIAdoptionProcess() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isScrollingRef = useRef(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,11 +82,14 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Calculate if we're in the horizontal scroll zone
+      // Calculate horizontal scroll zone - only when section is in view
       const horizontalScrollStart = sectionTop - windowHeight;
       const horizontalScrollEnd = sectionTop + sectionHeight - windowHeight;
       
-      if (scrollY >= horizontalScrollStart && scrollY <= horizontalScrollEnd) {
+      // Check if we're in the horizontal scroll zone
+      const isInZone = scrollY >= horizontalScrollStart && scrollY <= horizontalScrollEnd;
+      
+      if (isInZone) {
         setIsInHorizontalScroll(true);
         
         // Calculate horizontal scroll progress
@@ -104,18 +108,21 @@ export default function AIAdoptionProcess() {
         const maxScrollLeft = content.scrollWidth - content.clientWidth;
         const targetScrollLeft = clampedProgress * maxScrollLeft;
         
-        isScrollingRef.current = true;
         content.scrollLeft = targetScrollLeft;
         
-        // Prevent default scroll behavior
-        window.scrollTo(0, horizontalScrollStart);
-        
-        setTimeout(() => {
-          isScrollingRef.current = false;
-        }, 10);
+        // Only prevent scroll if we're trying to scroll past the end
+        if (scrollY > horizontalScrollEnd) {
+          isScrollingRef.current = true;
+          window.scrollTo(0, horizontalScrollEnd);
+          setTimeout(() => {
+            isScrollingRef.current = false;
+          }, 10);
+        }
       } else {
         setIsInHorizontalScroll(false);
       }
+      
+      lastScrollY.current = scrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: false });
@@ -125,7 +132,7 @@ export default function AIAdoptionProcess() {
   }, [activeStage]);
 
   const scrollToStage = (stageId: number) => {
-    if (!sectionRef.current || !contentRef.current) return;
+    if (!sectionRef.current) return;
 
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
