@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Stage {
   id: number;
@@ -65,15 +65,20 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const [isInHorizontalScroll, setIsInHorizontalScroll] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const isScrollingRef = useRef(false);
+  const rafId = useRef<number | null>(null);
   const lastScrollY = useRef(0);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current || !contentRef.current || isScrollingRef.current) return;
+  // Throttled scroll handler using requestAnimationFrame
+  const handleScroll = useCallback(() => {
+    if (rafId.current) return;
+    
+    rafId.current = requestAnimationFrame(() => {
+      if (!sectionRef.current || !contentRef.current) {
+        rafId.current = null;
+        return;
+      }
 
       const section = sectionRef.current;
       const content = contentRef.current;
@@ -82,7 +87,7 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Calculate horizontal scroll zone - only when section is in view
+      // Calculate horizontal scroll zone
       const horizontalScrollStart = sectionTop - windowHeight;
       const horizontalScrollEnd = sectionTop + sectionHeight - windowHeight;
       
@@ -90,8 +95,6 @@ export default function AIAdoptionProcess() {
       const isInZone = scrollY >= horizontalScrollStart && scrollY <= horizontalScrollEnd;
       
       if (isInZone) {
-        setIsInHorizontalScroll(true);
-        
         // Calculate horizontal scroll progress
         const scrollProgress = (scrollY - horizontalScrollStart) / (horizontalScrollEnd - horizontalScrollStart);
         const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
@@ -104,32 +107,36 @@ export default function AIAdoptionProcess() {
           setActiveStage(newActiveStage);
         }
         
-        // Scroll content horizontally
+        // Scroll content horizontally smoothly
         const maxScrollLeft = content.scrollWidth - content.clientWidth;
         const targetScrollLeft = clampedProgress * maxScrollLeft;
         
-        content.scrollLeft = targetScrollLeft;
-        
-        // Only prevent scroll if we're trying to scroll past the end
-        if (scrollY > horizontalScrollEnd) {
-          isScrollingRef.current = true;
-          window.scrollTo(0, horizontalScrollEnd);
-          setTimeout(() => {
-            isScrollingRef.current = false;
-          }, 10);
-        }
-      } else {
-        setIsInHorizontalScroll(false);
+        // Use smooth scrolling instead of direct assignment
+        content.scrollTo({
+          left: targetScrollLeft,
+          behavior: 'smooth'
+        });
       }
       
       lastScrollY.current = scrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: false });
-    handleScroll(); // Initial call
-
-    return () => window.removeEventListener('scroll', handleScroll);
+      rafId.current = null;
+    });
   }, [activeStage]);
+
+  useEffect(() => {
+    // Use passive: true for better performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial call
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, [handleScroll]);
 
   const scrollToStage = (stageId: number) => {
     if (!sectionRef.current) return;
@@ -181,7 +188,7 @@ export default function AIAdoptionProcess() {
                 </span>
                 <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full rounded-full transition-all duration-300 ease-out"
+                    className="h-full rounded-full transition-all duration-500 ease-out"
                     style={{ 
                       width: `${(activeStage / 5) * 100}%`,
                       backgroundColor: '#595F39'
@@ -198,11 +205,11 @@ export default function AIAdoptionProcess() {
                   <button
                     key={stage.id}
                     onClick={() => scrollToStage(stage.id)}
-                    className="flex flex-col items-center group cursor-pointer"
+                    className="flex flex-col items-center group cursor-pointer transition-all duration-300"
                   >
                     <div
                       className={`
-                        w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
+                        w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-500 ease-out
                         ${activeStage === stage.id ? 'scale-110 shadow-lg' : 'hover:scale-105'}
                       `}
                       style={{
@@ -213,13 +220,13 @@ export default function AIAdoptionProcess() {
                       {stage.id}
                     </div>
                     <span className={`
-                      mt-3 text-sm font-medium transition-colors duration-300
+                      mt-3 text-sm font-medium transition-colors duration-500 ease-out
                       ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
                     `}>
                       {stage.label}
                     </span>
                     <span 
-                      className="px-2 py-1 text-xs font-medium rounded-full mt-1"
+                      className="px-2 py-1 text-xs font-medium rounded-full mt-1 transition-all duration-500 ease-out"
                       style={{
                         backgroundColor: activeStage === stage.id ? '#595F39' : '#9C8B5E',
                         color: 'white',
@@ -248,7 +255,7 @@ export default function AIAdoptionProcess() {
               {stages.map((stage) => (
                 <div 
                   key={stage.id}
-                  className="w-full flex-shrink-0 px-6"
+                  className="w-full flex-shrink-0 px-6 pb-20"
                 >
                   <div className="max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -359,7 +366,7 @@ export default function AIAdoptionProcess() {
                   key={stage.id}
                   onClick={() => scrollToStage(stage.id)}
                   className={`
-                    w-3 h-3 rounded-full transition-all duration-300
+                    w-3 h-3 rounded-full transition-all duration-500 ease-out
                     ${activeStage === stage.id ? 'scale-125' : 'hover:scale-110'}
                   `}
                   style={{
@@ -372,8 +379,8 @@ export default function AIAdoptionProcess() {
         </div>
       </div>
 
-      {/* Bottom CTA - Fixed at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white py-16 px-6">
+      {/* Bottom CTA - Positioned after the section ends */}
+      <div className="absolute bottom-0 left-0 right-0 bg-white py-16 px-6 border-t border-gray-100">
         <div className="text-center">
           <p className="text-lg text-gray-600 mb-6 font-light">
             Ready to start your AI transformation journey?
