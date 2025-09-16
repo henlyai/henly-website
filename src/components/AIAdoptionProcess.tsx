@@ -71,9 +71,8 @@ export default function AIAdoptionProcess() {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToStage = useCallback((stageId: number) => {
-    if (!sectionRef.current || !contentRef.current) return;
+    if (!contentRef.current) return;
     
-    const section = sectionRef.current;
     const content = contentRef.current;
     const stageIndex = stageId - 1;
     const stageWidth = content.scrollWidth / stages.length;
@@ -240,11 +239,12 @@ export default function AIAdoptionProcess() {
         {/* Horizontal Scroll Container */}
         <div 
           ref={contentRef}
-          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+          className="flex overflow-x-auto snap-x snap-mandatory"
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
-            scrollBehavior: 'smooth'
+            scrollBehavior: 'smooth',
+            WebkitScrollbar: { display: 'none' }
           }}
         >
           {stages.map((stage) => (
