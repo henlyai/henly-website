@@ -306,7 +306,7 @@ export default function Home() {
               Get Started Today
             </h2>
             <p className="text-xl sm:text-2xl text-white/90 mb-12 leading-relaxed font-light max-w-3xl mx-auto">
-              Book a free workflow & AI readiness audit for your business today
+              Book a free AI adoption strategy consultation and chatbot implementation assessment
             </p>
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -335,7 +335,7 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            <h2 className="text-4xl sm:text-5xl font-light mb-6">WORLD-CLASS</h2>
+            <h2 className="text-4xl sm:text-5xl font-light mb-6 text-white">Measurable Impacts</h2>
             <p className="text-xl sm:text-2xl text-gray-200 mb-20 font-light">Agents & automations that improve your bottom line</p>
           
             <div className="grid md:grid-cols-3 gap-16">

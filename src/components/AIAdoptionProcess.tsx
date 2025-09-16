@@ -15,7 +15,7 @@ interface Stage {
 const stages: Stage[] = [
   {
     id: 1,
-    label: 'Diagnose',
+    label: 'Analysis',
     purpose: 'Understand AI maturity, risks, and opportunities; align on where to start.',
     weDo: ['Company survey & interviews', 'Infra/data/governance review', 'Risk workshop'],
     youGet: ['AI Readiness Report', 'Current State Analysis', 'Risk & Limitations Register', 'SWOT', 'Roadmap'],
@@ -24,7 +24,7 @@ const stages: Stage[] = [
   },
   {
     id: 2,
-    label: 'Enable',
+    label: 'Enablement',
     purpose: 'Build AI-native culture: train champions while leadership sets guardrails.',
     weDo: [
       'Ambassadors: Selection & onboarding; weekly training; use-case discovery; prompt library; Agent/MCP requirements',
@@ -80,10 +80,9 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Start horizontal scroll when section is centered on page (so CTA below is visible)
-      // End horizontal scroll when section is almost at the bottom (so last stage is fully visible)
-      const sectionStart = sectionTop - (windowHeight * 0.5); // Start when section is centered
-      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.1); // End when section is 10% from bottom
+      // Much more conservative timing - start when section is almost at top, end when almost at bottom
+      const sectionStart = sectionTop - (windowHeight * 0.8); // Start when section is 80% from top
+      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.8); // End when section is 80% from bottom
       
       if (scrollY >= sectionStart && scrollY <= sectionEnd) {
         // Calculate progress through the section
@@ -129,8 +128,8 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - (windowHeight * 0.5);
-    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.1);
+    const sectionStart = sectionTop - (windowHeight * 0.8);
+    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.8);
     
     const progress = (stageId - 1) / (stages.length - 1);
     const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
@@ -150,7 +149,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 120}vh` }} // Increased from 80vh to 120vh for taller section
+      style={{ height: `${stages.length * 150}vh` }} // Increased to 150vh for even more space
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
@@ -161,8 +160,8 @@ export default function AIAdoptionProcess() {
               Our 5-Stage AI Adoption <span style={{ color: '#595F39' }}>Process</span>
             </h2>
             <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
-              A proven roadmap to transform your business with AI. Get it in 10 seconds, 
-              explore each stage to discover our comprehensive approach.
+              Transform your business with AI before your competitors do. Our proven methodology delivers measurable results, 
+              competitive advantage, and future-ready operations that scale with your growth.
             </p>
           </div>
 
