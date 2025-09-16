@@ -1,6 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 interface Stage {
   id: number;
@@ -65,29 +70,17 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const [isHorizontalMode, setIsHorizontalMode] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const isScrollingRef = useRef<boolean>(false);
-  const originalScrollBehaviorRef = useRef<string>('');
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
-  // Store original scroll behavior
-  useEffect(() => {
-    originalScrollBehaviorRef.current = document.documentElement.style.scrollBehavior || 'smooth';
-  }, []);
-
-  const scrollToStage = useCallback((stageId: number) => {
-    if (!contentRef.current || isScrollingRef.current) return;
-    
-    isScrollingRef.current = true;
+  const scrollToStage = (stageId: number) => {
+    if (!contentRef.current) return;
     
     const content = contentRef.current;
     const stageIndex = stageId - 1;
     const stageWidth = content.scrollWidth / stages.length;
     const targetScrollLeft = stageIndex * stageWidth;
-    
-    // Temporarily disable global scroll behavior
-    document.documentElement.style.scrollBehavior = 'auto';
     
     content.scrollTo({
       left: targetScrollLeft,
@@ -95,16 +88,10 @@ export default function AIAdoptionProcess() {
     });
     
     setActiveStage(stageId);
-    
-    // Re-enable scrolling after animation
-    setTimeout(() => {
-      isScrollingRef.current = false;
-      document.documentElement.style.scrollBehavior = originalScrollBehaviorRef.current;
-    }, 500);
-  }, []);
+  };
 
-  const handleScroll = useCallback(() => {
-    if (!contentRef.current || isScrollingRef.current) return;
+  const handleScroll = () => {
+    if (!contentRef.current) return;
     
     const content = contentRef.current;
     const scrollLeft = content.scrollLeft;
@@ -115,86 +102,71 @@ export default function AIAdoptionProcess() {
     if (newActiveStage !== activeStage) {
       setActiveStage(newActiveStage);
     }
-  }, [activeStage]);
-
-  const handleWheel = useCallback((e: WheelEvent) => {
-    if (!sectionRef.current || !contentRef.current || isScrollingRef.current) return;
-    
-    const section = sectionRef.current;
-    const rect = section.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    
-    // Check if section is centered in viewport (with buffer)
-    const isCentered = rect.top <= viewportHeight * 0.6 && rect.bottom >= viewportHeight * 0.4;
-    
-    if (isCentered) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      
-      if (!isHorizontalMode) {
-        setIsHorizontalMode(true);
-        // Disable global scroll behavior
-        document.documentElement.style.scrollBehavior = 'auto';
-      }
-      
-      const content = contentRef.current;
-      const delta = e.deltaY;
-      const currentScrollLeft = content.scrollLeft;
-      const stageWidth = content.scrollWidth / stages.length;
-      
-      let targetStage = Math.round(currentScrollLeft / stageWidth);
-      
-      if (delta > 0) {
-        targetStage = Math.min(targetStage + 1, stages.length - 1);
-      } else {
-        targetStage = Math.max(targetStage - 1, 0);
-      }
-      
-      const targetScrollLeft = targetStage * stageWidth;
-      
-      content.scrollTo({
-        left: targetScrollLeft,
-        behavior: 'smooth'
-      });
-      
-      setActiveStage(targetStage + 1);
-    } else if (isHorizontalMode) {
-      // Exit horizontal mode when section is not centered
-      setIsHorizontalMode(false);
-      // Restore global scroll behavior
-      document.documentElement.style.scrollBehavior = originalScrollBehaviorRef.current;
-    }
-  }, [isHorizontalMode]);
-
-  // Prevent all wheel events when in horizontal mode
-  const preventWheelEvents = useCallback((e: WheelEvent) => {
-    if (isHorizontalMode) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-    }
-  }, [isHorizontalMode]);
+  };
 
   useEffect(() => {
+    const section = sectionRef.current;
     const content = contentRef.current;
-    if (!content) return;
+    
+    if (!section || !content) return;
 
+    // Get all stage elements
+    const stageElements = content.querySelectorAll('.stage-panel');
+    
+    // Create horizontal scroll animation using GSAP ScrollTrigger
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        pin: true,
+        start: "top top",
+        end: () => `+=${content.scrollWidth - window.innerWidth}`,
+        scrub: 1,
+        snap: {
+          snapTo: 1 / (stages.length - 1),
+          duration: { min: 0.2, max: 1 },
+          delay: 0.1,
+          onComplete: () => {
+            // Update active stage when snap completes
+            const progress = scrollTriggerRef.current?.progress || 0;
+            const stageIndex = Math.round(progress * (stages.length - 1));
+            setActiveStage(stageIndex + 1);
+          }
+        },
+        onUpdate: (self) => {
+          // Update active stage during scroll
+          const progress = self.progress;
+          const stageIndex = Math.round(progress * (stages.length - 1));
+          setActiveStage(stageIndex + 1);
+        },
+        onRefresh: () => {
+          // Recalculate when window resizes
+          ScrollTrigger.refresh();
+        }
+      }
+    });
+
+    // Animate horizontal movement
+    tl.to(content, {
+      x: () => -(content.scrollWidth - window.innerWidth),
+      ease: "none"
+    });
+
+    // Store ScrollTrigger reference for cleanup
+    scrollTriggerRef.current = ScrollTrigger.getById(tl.scrollTrigger?.id || '');
+
+    // Add scroll listener for click navigation
     content.addEventListener('scroll', handleScroll);
-    
-    // Add wheel event listeners with different capture phases
-    window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-    document.addEventListener('wheel', preventWheelEvents, { passive: false, capture: true });
-    
+
+    // Cleanup function
     return () => {
       content.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel, { capture: true });
-      document.removeEventListener('wheel', preventWheelEvents, { capture: true });
-      
-      // Restore original scroll behavior on cleanup
-      document.documentElement.style.scrollBehavior = originalScrollBehaviorRef.current;
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger === section) {
+          trigger.kill();
+        }
+      });
     };
-  }, [handleScroll, handleWheel, preventWheelEvents]);
+  }, []);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
@@ -238,13 +210,11 @@ export default function AIAdoptionProcess() {
                   key={stage.id}
                   onClick={() => scrollToStage(stage.id)}
                   className="flex flex-col items-center group cursor-pointer"
-                  disabled={isScrollingRef.current}
                 >
                   <div
                     className={`
                       w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
                       ${activeStage === stage.id ? 'scale-110 shadow-lg' : 'hover:scale-105'}
-                      ${isScrollingRef.current ? 'opacity-50 cursor-not-allowed' : ''}
                     `}
                     style={{
                       backgroundColor: activeStage === stage.id ? '#595F39' : '#E5E7EB',
@@ -278,18 +248,16 @@ export default function AIAdoptionProcess() {
         {/* Horizontal Scroll Container */}
         <div 
           ref={contentRef}
-          className="flex overflow-x-auto snap-x snap-mandatory"
+          className="flex overflow-hidden"
           style={{ 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none',
-            WebkitScrollbar: { display: 'none' },
-            scrollBehavior: 'auto'
+            width: '100%',
+            height: 'auto'
           }}
         >
           {stages.map((stage) => (
             <div 
               key={stage.id}
-              className="w-full flex-shrink-0 snap-start px-6"
+              className="stage-panel w-screen flex-shrink-0 px-6"
             >
               <div className="max-w-6xl mx-auto">
                 <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -398,12 +366,10 @@ export default function AIAdoptionProcess() {
               className={`
                 w-3 h-3 rounded-full transition-all duration-300
                 ${activeStage === stage.id ? 'scale-125' : 'hover:scale-110'}
-                ${isScrollingRef.current ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               style={{
                 backgroundColor: activeStage === stage.id ? '#595F39' : '#D1D5DB'
               }}
-              disabled={isScrollingRef.current}
             />
           ))}
         </div>
