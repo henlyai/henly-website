@@ -115,7 +115,7 @@ export default function AIAdoptionProcess() {
     const isInSection = rect.top < 100 && rect.bottom > 100;
     
     if (isInSection) {
-      // Prevent ALL scrolling when in horizontal mode
+      // ALWAYS prevent vertical scrolling when in section
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
@@ -156,23 +156,41 @@ export default function AIAdoptionProcess() {
     }
   }, [isHorizontalMode]);
 
+  // Aggressive wheel event prevention
+  const preventAllWheel = useCallback((e: WheelEvent) => {
+    if (isHorizontalMode) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+  }, [isHorizontalMode]);
+
   useEffect(() => {
     const content = contentRef.current;
     if (!content) return;
 
-    // Override global scroll behavior for this component
+    // Override global scroll behavior
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
 
     content.addEventListener('scroll', handleScroll);
+    
+    // Add multiple event listeners to catch all wheel events
     document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    document.addEventListener('wheel', preventAllWheel, { passive: false, capture: true });
+    window.addEventListener('wheel', preventAllWheel, { passive: false, capture: true });
+    document.body.addEventListener('wheel', preventAllWheel, { passive: false, capture: true });
     
     return () => {
       content.removeEventListener('scroll', handleScroll);
       document.removeEventListener('wheel', handleWheel, { capture: true });
+      document.removeEventListener('wheel', preventAllWheel, { capture: true });
+      window.removeEventListener('wheel', preventAllWheel, { capture: true });
+      document.body.removeEventListener('wheel', preventAllWheel, { capture: true });
       document.documentElement.style.scrollBehavior = originalScrollBehavior;
     };
-  }, [handleScroll, handleWheel]);
+  }, [handleScroll, handleWheel, preventAllWheel]);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
