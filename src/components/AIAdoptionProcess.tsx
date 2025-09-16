@@ -80,14 +80,17 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Fixed scroll timing:
-      // Start horizontal scroll when section is in view (but not too early)
-      // End horizontal scroll when section is almost at bottom
-      const sectionStart = sectionTop - (windowHeight * 0.2); // Start when section is 20% from top
-      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.1); // End when section is 10% from bottom
+      // Add buffers/delays for smooth transitions:
+      // Buffer at start: wait until section is fully in view before starting horizontal scroll
+      // Buffer at end: complete horizontal scroll before allowing vertical to continue
+      const bufferStart = windowHeight * 0.3; // 30% buffer at start
+      const bufferEnd = windowHeight * 0.2;   // 20% buffer at end
+      
+      const sectionStart = sectionTop - bufferStart; // Start horizontal scroll with buffer
+      const sectionEnd = sectionTop + sectionHeight - bufferEnd; // End horizontal scroll with buffer
       
       if (scrollY >= sectionStart && scrollY <= sectionEnd) {
-        // Calculate progress through the section
+        // Calculate progress through the horizontal scroll zone
         const progress = (scrollY - sectionStart) / (sectionEnd - sectionStart);
         const clampedProgress = Math.max(0, Math.min(1, progress));
         
@@ -129,9 +132,13 @@ export default function AIAdoptionProcess() {
 
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
+    const sectionHeight = section.offsetHeight;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - (windowHeight * 0.2);
-    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.1);
+    const bufferStart = windowHeight * 0.3;
+    const bufferEnd = windowHeight * 0.2;
+    
+    const sectionStart = sectionTop - bufferStart;
+    const sectionEnd = sectionTop + sectionHeight - bufferEnd;
     
     const progress = (stageId - 1) / (stages.length - 1);
     const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
@@ -151,7 +158,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 150}vh` }} // Reduced back to 150vh
+      style={{ height: `${stages.length * 150}vh` }}
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
