@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { ArrowRight, Shield, Zap, Users, BarChart3, Clock, DollarSign, TrendingUp, MessageSquare, UserCheck, Settings, Play, Star, CheckCircle } from 'lucide-react'
 import CustomerLogos from '@/components/CustomerLogos'
-import AIAdoptionProgram from '@/components/AIAdoptionProgram'
+import AIAdoptionProcess from '@/components/AIAdoptionProcess'
 
 // Particle component for the animation
 const Particle = ({ delay, startX, startY, targetX, targetY }: {
@@ -293,7 +293,7 @@ export default function Home() {
       <CustomerLogos />
 
       {/* AI Adoption Program Section */}
-      <AIAdoptionProgram />      {/* Enhanced CTA Section */}
+      <AIAdoptionProcess />      {/* Enhanced CTA Section */}
       <section id="book-call" className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#595F39' }}>
         <div className="max-w-6xl mx-auto text-center">
           <motion.div

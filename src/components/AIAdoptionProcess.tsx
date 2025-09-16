@@ -63,7 +63,7 @@ const stages: Stage[] = [
   }
 ];
 
-export default function AIAdoptionProgram() {
+export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -121,27 +121,27 @@ export default function AIAdoptionProgram() {
       className="py-24 bg-white"
       id="ai-adoption-process"
     >
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-20">
           <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
             Our 5-Stage AI Adoption <span style={{ color: '#595F39' }}>Process</span>
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 max-w-3xl mx-auto font-light">
             A proven roadmap to transform your business with AI. Get it in 10 seconds, 
-            expand each stage to explore our comprehensive approach.
+            explore each stage to discover our comprehensive approach.
           </p>
         </div>
 
         {/* Progress Indicator */}
-        <div className="flex justify-center mb-12">
-          <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2">
+        <div className="flex justify-center mb-16">
+          <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
             <span className="text-sm font-medium text-gray-600">
-              {activeStage}/5
+              Stage {activeStage} of 5
             </span>
-            <div className="w-24 h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
               <div 
-                className="h-full rounded-full transition-all duration-300 ease-out"
+                className="h-full rounded-full transition-all duration-500 ease-out"
                 style={{ 
                   width: `${(activeStage / 5) * 100}%`,
                   backgroundColor: '#595F39'
@@ -151,129 +151,73 @@ export default function AIAdoptionProgram() {
           </div>
         </div>
 
-        {/* Folder Stack */}
-        <div className="space-y-4">
-          {stages.map((stage, index) => {
-            const isActive = activeStage === stage.id;
-            const isExpanded = isActive;
-            
-            return (
-              <div
-                key={stage.id}
-                className={`
-                  relative transition-all duration-500 ease-out
-                  ${isExpanded ? 'z-10' : 'z-0'}
-                `}
-                style={{
-                  transform: isExpanded 
-                    ? 'scale(1.02)' 
-                    : `scale(${1 - (stages.length - index) * 0.02})`,
-                }}
-              >
-                {/* Folder */}
-                <div
-                  className={`
-                    relative overflow-hidden rounded-2xl border-2 transition-all duration-500 ease-out
-                    ${isExpanded 
-                      ? 'bg-white border-gray-200 shadow-xl' 
-                      : 'bg-gray-50 border-gray-200 shadow-sm hover:shadow-md'
-                    }
-                  `}
-                >
-                  {/* Folder Header */}
-                  <div
-                    className={`
-                      px-8 py-6 cursor-pointer transition-all duration-300 ease-out
-                      ${isExpanded ? 'bg-gray-50' : 'bg-white hover:bg-gray-50'}
-                    `}
-                    onClick={() => setActiveStage(stage.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        {/* Stage Number */}
-                        <div
-                          className={`
-                            w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
-                            ${isExpanded 
-                              ? 'text-white' 
-                              : 'bg-gray-200 text-gray-600'
-                            }
-                          `}
-                          style={{
-                            backgroundColor: isExpanded ? '#595F39' : undefined
-                          }}
-                        >
-                          {stage.id}
-                        </div>
-                        
-                        {/* Stage Label */}
-                        <div>
-                          <h3 className={`
-                            text-2xl sm:text-3xl font-medium transition-colors duration-300
-                            ${isExpanded ? 'text-gray-900' : 'text-gray-900'}
-                          `}>
-                            {stage.label}
-                          </h3>
-                          <p className={`
-                            text-sm transition-colors duration-300 mt-1 font-light
-                            ${isExpanded ? 'text-gray-600' : 'text-gray-500'}
-                          `}>
-                            {stage.purpose}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Timeline Badge */}
-                      <div className="flex items-center space-x-3">
-                        <span 
-                          className="px-3 py-1 text-xs font-medium rounded-full"
-                          style={{
-                            backgroundColor: '#9C8B5E20',
-                            color: '#9C8B5E'
-                          }}
-                        >
-                          {stage.timeline}
-                        </span>
-                        
-                        {/* Expand/Collapse Indicator */}
-                        <div
-                          className={`
-                            w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
-                            ${isExpanded ? 'text-white' : 'bg-gray-200 text-gray-500'}
-                          `}
-                          style={{
-                            backgroundColor: isExpanded ? '#595F39' : undefined
-                          }}
-                        >
-                          <svg
-                            className={`w-4 h-4 transition-transform duration-300 ${
-                              isExpanded ? 'rotate-180' : 'rotate-0'
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
+        {/* Horizontal Timeline */}
+        <div className="relative">
+          {/* Timeline Line */}
+          <div className="absolute top-16 left-0 right-0 h-0.5 bg-gray-200 hidden lg:block" />
+          
+          {/* Stages Grid */}
+          <div className="grid lg:grid-cols-5 gap-8 lg:gap-4">
+            {stages.map((stage, index) => {
+              const isActive = activeStage === stage.id;
+              const isCompleted = activeStage > stage.id;
+              
+              return (
+                <div key={stage.id} className="relative">
+                  {/* Timeline Node */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div
+                      className={`
+                        w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-500 ease-out
+                        ${isActive ? 'scale-110 shadow-lg' : 'scale-100'}
+                        ${isCompleted ? 'shadow-md' : ''}
+                      `}
+                      style={{
+                        backgroundColor: isActive ? '#595F39' : isCompleted ? '#9C8B5E' : '#E5E7EB',
+                        color: isActive || isCompleted ? 'white' : '#6B7280'
+                      }}
+                    >
+                      {stage.id}
                     </div>
+                    
+                    {/* Stage Label */}
+                    <h3 className={`
+                      text-lg font-medium mt-4 text-center transition-colors duration-300
+                      ${isActive ? 'text-gray-900' : 'text-gray-600'}
+                    `}>
+                      {stage.label}
+                    </h3>
+                    
+                    {/* Timeline Badge */}
+                    <span 
+                      className="px-3 py-1 text-xs font-medium rounded-full mt-2"
+                      style={{
+                        backgroundColor: isActive ? '#595F39' : '#9C8B5E',
+                        color: 'white',
+                        opacity: isActive ? 1 : 0.8
+                      }}
+                    >
+                      {stage.timeline}
+                    </span>
                   </div>
 
-                  {/* Folder Content */}
-                  <div
-                    className={`
-                      overflow-hidden transition-all duration-500 ease-out
-                      ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}
-                    `}
-                  >
-                    <div className="px-8 pb-8">
-                      {/* We Do Section */}
+                  {/* Stage Content */}
+                  <div className={`
+                    transition-all duration-500 ease-out
+                    ${isActive ? 'opacity-100 max-h-[600px]' : 'opacity-0 max-h-0 overflow-hidden'}
+                  `}>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
+                      {/* Purpose */}
+                      <div className="mb-6">
+                        <h4 className="text-lg font-medium text-gray-900 mb-3">
+                          Purpose
+                        </h4>
+                        <p className="text-gray-600 font-light leading-relaxed">
+                          {stage.purpose}
+                        </p>
+                      </div>
+
+                      {/* We Do */}
                       <div className="mb-6">
                         <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide flex items-center">
                           <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
@@ -281,14 +225,14 @@ export default function AIAdoptionProgram() {
                         </h4>
                         <div className="space-y-2">
                           {stage.weDo.map((item, itemIndex) => (
-                            <p key={itemIndex} className="text-gray-900 text-sm leading-relaxed font-light">
+                            <p key={itemIndex} className="text-gray-600 text-sm leading-relaxed font-light">
                               {item}
                             </p>
                           ))}
                         </div>
                       </div>
 
-                      {/* You Get Section */}
+                      {/* You Get */}
                       <div className="mb-6">
                         <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide flex items-center">
                           <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
@@ -298,7 +242,7 @@ export default function AIAdoptionProgram() {
                           {stage.youGet.map((item, itemIndex) => (
                             <span
                               key={itemIndex}
-                              className="px-3 py-1 text-sm rounded-full font-medium"
+                              className="px-3 py-1 text-xs rounded-full font-medium"
                               style={{
                                 backgroundColor: '#9C8B5E20',
                                 color: '#9C8B5E'
@@ -310,32 +254,55 @@ export default function AIAdoptionProgram() {
                         </div>
                       </div>
 
-                      {/* Success Looks Like Section */}
-                      <div className="mb-6">
+                      {/* Success Looks Like */}
+                      <div>
                         <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide flex items-center">
                           <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
                           Success Looks Like
                         </h4>
-                        <p className="text-gray-900 text-sm leading-relaxed font-light">
+                        <p className="text-gray-600 text-sm leading-relaxed font-light">
                           {stage.successLooksLike}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Navigation Controls */}
+        <div className="flex justify-center mt-16 space-x-4">
+          {stages.map((stage) => (
+            <button
+              key={stage.id}
+              onClick={() => setActiveStage(stage.id)}
+              className={`
+                w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300
+                ${activeStage === stage.id 
+                  ? 'scale-110 shadow-lg' 
+                  : 'hover:scale-105 hover:shadow-md'
+                }
+              `}
+              style={{
+                backgroundColor: activeStage === stage.id ? '#595F39' : '#E5E7EB',
+                color: activeStage === stage.id ? 'white' : '#6B7280'
+              }}
+            >
+              {stage.id}
+            </button>
+          ))}
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-20">
           <p className="text-lg text-gray-600 mb-6 font-light">
             Ready to start your AI transformation journey?
           </p>
           <a
             href="#book-call"
-            className="inline-flex items-center px-8 py-4 text-white font-semibold rounded-lg hover:opacity-90 transition-colors duration-200"
+            className="inline-flex items-center px-8 py-4 text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             style={{ backgroundColor: '#595F39' }}
           >
             Get Started Today
