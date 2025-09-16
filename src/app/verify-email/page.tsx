@@ -63,14 +63,9 @@ function VerifyEmailContent() {
       setSuccess(true)
       setUser(result.profile)
 
-      // Redirect to organization dashboard after 5 seconds
+      // Redirect to login page after 5 seconds for invited users
       setTimeout(() => {
-        const organization = (result.profile as any).organizations
-        if (organization?.slug) {
-          router.push(`/dashboard?org=${organization.slug}`)
-        } else {
-          router.push('/dashboard')
-        }
+        router.push('/login')
       }, 5000)
 
     } catch (err) {
@@ -135,7 +130,7 @@ function VerifyEmailContent() {
             </p>
           </div>
           <p className="text-sm text-gray-500">
-            Redirecting to your organization dashboard in 5 seconds...
+            Redirecting to login page in 5 seconds...
           </p>
         </div>
       </div>
