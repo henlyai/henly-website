@@ -80,9 +80,9 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Calculate when section is in view
-      const sectionStart = sectionTop - windowHeight;
-      const sectionEnd = sectionTop + sectionHeight - windowHeight;
+      // Adjust scroll zone - start horizontal scroll when section is more in view
+      const sectionStart = sectionTop - (windowHeight * 0.3); // Start when section is 30% in view
+      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.2); // End when section is 20% from bottom
       
       if (scrollY >= sectionStart && scrollY <= sectionEnd) {
         // Calculate progress through the section
@@ -128,8 +128,8 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - windowHeight;
-    const sectionEnd = sectionTop + section.offsetHeight - windowHeight;
+    const sectionStart = sectionTop - (windowHeight * 0.3);
+    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.2);
     
     const progress = (stageId - 1) / (stages.length - 1);
     const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
@@ -149,7 +149,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 100}vh` }}
+      style={{ height: `${stages.length * 80}vh` }} // Reduced from 100vh to 80vh for tighter spacing
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
@@ -242,7 +242,7 @@ export default function AIAdoptionProcess() {
               {stages.map((stage) => (
                 <div 
                   key={stage.id}
-                  className="w-full flex-shrink-0 px-6 pb-20"
+                  className="w-full flex-shrink-0 px-6 pb-8" // Reduced pb from 20 to 8
                 >
                   <div className="max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -362,8 +362,8 @@ export default function AIAdoptionProcess() {
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white py-16 px-6 border-t border-gray-100">
+      {/* CTA - Fixed at bottom without scroll effect */}
+      <div className="bg-white py-16 px-6 border-t border-gray-100">
         <div className="text-center">
           <p className="text-lg text-gray-600 mb-6 font-light">
             Ready to start your AI transformation journey?
