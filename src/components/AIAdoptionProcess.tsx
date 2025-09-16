@@ -80,14 +80,23 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Start horizontal scroll only when section reaches the bottom (when section top reaches viewport bottom)
-      // End when section is almost at the very bottom
-      const sectionStart = sectionTop - windowHeight; // Start when section top reaches bottom of viewport
-      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.1); // End when section is 10% from bottom
+      // Comprehensive scroll timing:
+      // 1. First stage stays visible until user scrolls to bottom of section
+      // 2. Horizontal scroll only starts when section bottom reaches viewport top
+      // 3. Vertical scroll only resumes when last stage is completely done
       
-      if (scrollY >= sectionStart && scrollY <= sectionEnd) {
-        // Calculate progress through the section
-        const progress = (scrollY - sectionStart) / (sectionEnd - sectionStart);
+      const sectionBottom = sectionTop + sectionHeight;
+      const viewportTop = scrollY;
+      const viewportBottom = scrollY + windowHeight;
+      
+      // Start horizontal scroll when section bottom reaches viewport top
+      const horizontalScrollStart = sectionBottom - windowHeight;
+      // End horizontal scroll when section top reaches viewport bottom (last stage complete)
+      const horizontalScrollEnd = sectionTop;
+      
+      if (scrollY >= horizontalScrollStart && scrollY <= horizontalScrollEnd) {
+        // Calculate progress through the horizontal scroll zone
+        const progress = (scrollY - horizontalScrollStart) / (horizontalScrollEnd - horizontalScrollStart);
         const clampedProgress = Math.max(0, Math.min(1, progress));
         
         // Update active stage
@@ -128,12 +137,15 @@ export default function AIAdoptionProcess() {
 
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
+    const sectionHeight = section.offsetHeight;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - windowHeight;
-    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.1);
+    const sectionBottom = sectionTop + sectionHeight;
+    
+    const horizontalScrollStart = sectionBottom - windowHeight;
+    const horizontalScrollEnd = sectionTop;
     
     const progress = (stageId - 1) / (stages.length - 1);
-    const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
+    const targetScrollY = horizontalScrollStart + (progress * (horizontalScrollEnd - horizontalScrollStart));
     
     // Temporarily disable smooth scrolling for this action
     document.documentElement.style.scrollBehavior = 'auto';
@@ -150,7 +162,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 150}vh` }}
+      style={{ height: `${stages.length * 200}vh` }} // Much taller for better control
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
