@@ -116,7 +116,7 @@ export default function Home() {
               />
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="#ai-adoption-program" className="text-gray-800 hover:text-gray-900 px-4 py-2 text-sm font-medium transition-colors">
+              <Link href="#ai-adoption-process" className="text-gray-800 hover:text-gray-900 px-4 py-2 text-sm font-medium transition-colors">
                 Solutions
               </Link>
               <Link href="#results" className="text-gray-800 hover:text-gray-900 px-4 py-2 text-sm font-medium transition-colors">
@@ -199,10 +199,10 @@ export default function Home() {
                 transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 <Link 
-                  href="#ai-adoption-program" 
+                  href="#ai-adoption-process" 
                   className="inline-flex items-center text-gray-800 hover:text-gray-900 px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50"
                 >
-                  View Program
+                  View Process
                 </Link>
               </motion.div>
             </motion.div>

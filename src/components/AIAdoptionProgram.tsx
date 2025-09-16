@@ -6,51 +6,60 @@ interface Stage {
   id: number;
   label: string;
   purpose: string;
-  chips: string[];
-  cta: string;
-  ctaLink?: string;
+  weDo: string[];
+  youGet: string[];
+  successLooksLike: string;
+  timeline: string;
 }
 
 const stages: Stage[] = [
   {
     id: 1,
     label: 'Diagnose',
-    purpose: 'Assess AI maturity, risks, and opportunities; leave with a clear roadmap.',
-    chips: ['Readiness report', 'Risk register', 'Roadmap'],
-    cta: 'Start Assessment',
-    ctaLink: '/assessment'
+    purpose: 'Understand AI maturity, risks, and opportunities; align on where to start.',
+    weDo: ['Company survey & interviews', 'Infra/data/governance review', 'Risk workshop'],
+    youGet: ['AI Readiness Report', 'Current State Analysis', 'Risk & Limitations Register', 'SWOT', 'Roadmap'],
+    successLooksLike: 'Clear priority roadmap, known risks with owners, baseline for adoption/ROI.',
+    timeline: '~4 weeks'
   },
   {
     id: 2,
     label: 'Enable',
-    purpose: 'Train ambassadors and set leadership guardrails (governance, incentives, ethics).',
-    chips: ['Ambassador training', 'Governance', 'Prompt library'],
-    cta: 'Begin Training',
-    ctaLink: '/training'
+    purpose: 'Build AI-native culture: train champions while leadership sets guardrails.',
+    weDo: [
+      'Ambassadors: Selection & onboarding; weekly training; use-case discovery; prompt library; Agent/MCP requirements',
+      'Leadership: Strategy workshops; performance integration; governance, incentives & ethics; comms & budget'
+    ],
+    youGet: ['Trained ambassadors', 'Use-case inventory', 'Prompt library', 'Agent/MCP specs', 'Governance & ethics framework', 'Incentive program'],
+    successLooksLike: 'Active champions, formal guardrails, validated backlog ready for Pilot.',
+    timeline: '~6–8 weeks'
   },
   {
     id: 3,
     label: 'Pilot',
-    purpose: 'Ship a scoped V1 on henly.ai and validate real use cases.',
-    chips: ['V1 chatbot', 'Test results', 'Validation report'],
-    cta: 'Launch Pilot',
-    ctaLink: '/pilot'
+    purpose: 'Ship a scoped V1, test with real users, iterate fast.',
+    weDo: ['Design/build/train chatbot', 'Create test cases & training data', 'Controlled pilot', 'Accuracy & relevance testing', 'Feedback loops'],
+    youGet: ['V1 chatbot', 'Test results & metrics', 'User feedback analysis', 'Use-case validation report', 'Rollout plan'],
+    successLooksLike: 'Measurable accuracy/satisfaction, signed-off plan for org-wide rollout.',
+    timeline: '~8–9 weeks'
   },
   {
     id: 4,
     label: 'Deploy',
-    purpose: 'Roll out the refined chatbot and playbook across the company.',
-    chips: ['AI playbook', 'Training', 'Adoption dashboard'],
-    cta: 'Scale Deployment',
-    ctaLink: '/deploy'
+    purpose: 'Scale the refined chatbot and playbook across teams with training and showcases.',
+    weDo: ['Finalize chatbot & AI Playbook', 'Org-wide training', 'Showcases & forums', 'Department roll-ins', 'Adoption monitoring'],
+    youGet: ['AI Playbook', 'Fully deployed chatbot', 'Training records', 'Use-case repository', 'Adoption dashboard', 'Dept guides'],
+    successLooksLike: 'Teams using the chatbot daily, playbook adopted, adoption trending up.',
+    timeline: '~8 weeks'
   },
   {
     id: 5,
     label: 'Evolve',
-    purpose: 'Improve monthly, add new use cases, and report ROI.',
-    chips: ['Monthly review', 'New use cases', 'Quarterly ROI'],
-    cta: 'Optimize Results',
-    ctaLink: '/optimize'
+    purpose: 'Make AI improvement a habit: review monthly, add use cases, track ROI.',
+    weDo: ['Monthly check-ins', 'Emerging tech evaluation', 'Performance monitoring', 'Advanced training', 'New use cases', 'ROI assessment'],
+    youGet: ['Monthly status reports', 'Emerging tech briefs', 'Continuous improvement recs', 'Updated roadmap', 'Quarterly ROI analysis'],
+    successLooksLike: 'Steady capability gains, responsible adoption, clear ROI to leadership.',
+    timeline: 'Ongoing (monthly/quarterly)'
   }
 ];
 
@@ -110,17 +119,17 @@ export default function AIAdoptionProgram() {
     <section 
       ref={containerRef}
       className="py-24 bg-white"
-      id="ai-adoption-program"
+      id="ai-adoption-process"
     >
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Our 5-Stage AI Adoption Program
+          <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
+            Our 5-Stage AI Adoption <span style={{ color: '#595F39' }}>Process</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl sm:text-2xl text-gray-900 max-w-3xl mx-auto font-light">
             A proven roadmap to transform your business with AI. Get it in 10 seconds, 
-            scan all stages in 2–3 minutes.
+            expand each stage to explore our comprehensive approach.
           </p>
         </div>
 
@@ -132,8 +141,11 @@ export default function AIAdoptionProgram() {
             </span>
             <div className="w-24 h-1 bg-gray-200 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-blue-600 rounded-full transition-all duration-300 ease-out"
-                style={{ width: `${(activeStage / 5) * 100}%` }}
+                className="h-full rounded-full transition-all duration-300 ease-out"
+                style={{ 
+                  width: `${(activeStage / 5) * 100}%`,
+                  backgroundColor: '#595F39'
+                }}
               />
             </div>
           </div>
@@ -163,7 +175,7 @@ export default function AIAdoptionProgram() {
                   className={`
                     relative overflow-hidden rounded-2xl border-2 transition-all duration-500 ease-out
                     ${isExpanded 
-                      ? 'bg-white border-blue-200 shadow-xl' 
+                      ? 'bg-white border-gray-200 shadow-xl' 
                       : 'bg-gray-50 border-gray-200 shadow-sm hover:shadow-md'
                     }
                   `}
@@ -172,7 +184,7 @@ export default function AIAdoptionProgram() {
                   <div
                     className={`
                       px-8 py-6 cursor-pointer transition-all duration-300 ease-out
-                      ${isExpanded ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'}
+                      ${isExpanded ? 'bg-gray-50' : 'bg-white hover:bg-gray-50'}
                     `}
                     onClick={() => setActiveStage(stage.id)}
                   >
@@ -183,10 +195,13 @@ export default function AIAdoptionProgram() {
                           className={`
                             w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
                             ${isExpanded 
-                              ? 'bg-blue-600 text-white' 
+                              ? 'text-white' 
                               : 'bg-gray-200 text-gray-600'
                             }
                           `}
+                          style={{
+                            backgroundColor: isExpanded ? '#595F39' : undefined
+                          }}
                         >
                           {stage.id}
                         </div>
@@ -194,42 +209,58 @@ export default function AIAdoptionProgram() {
                         {/* Stage Label */}
                         <div>
                           <h3 className={`
-                            text-2xl font-bold transition-colors duration-300
-                            ${isExpanded ? 'text-blue-900' : 'text-gray-900'}
+                            text-2xl sm:text-3xl font-medium transition-colors duration-300
+                            ${isExpanded ? 'text-gray-900' : 'text-gray-900'}
                           `}>
                             {stage.label}
                           </h3>
                           <p className={`
-                            text-sm transition-colors duration-300 mt-1
-                            ${isExpanded ? 'text-blue-700' : 'text-gray-500'}
+                            text-sm transition-colors duration-300 mt-1 font-light
+                            ${isExpanded ? 'text-gray-600' : 'text-gray-500'}
                           `}>
                             {stage.purpose}
                           </p>
                         </div>
                       </div>
 
-                      {/* Expand/Collapse Indicator */}
-                      <div
-                        className={`
-                          w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
-                          ${isExpanded ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}
-                        `}
-                      >
-                        <svg
-                          className={`w-4 h-4 transition-transform duration-300 ${
-                            isExpanded ? 'rotate-180' : 'rotate-0'
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                      {/* Timeline Badge */}
+                      <div className="flex items-center space-x-3">
+                        <span 
+                          className="px-3 py-1 text-xs font-medium rounded-full"
+                          style={{
+                            backgroundColor: '#9C8B5E20',
+                            color: '#9C8B5E'
+                          }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
+                          {stage.timeline}
+                        </span>
+                        
+                        {/* Expand/Collapse Indicator */}
+                        <div
+                          className={`
+                            w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
+                            ${isExpanded ? 'text-white' : 'bg-gray-200 text-gray-500'}
+                          `}
+                          style={{
+                            backgroundColor: isExpanded ? '#595F39' : undefined
+                          }}
+                        >
+                          <svg
+                            className={`w-4 h-4 transition-transform duration-300 ${
+                              isExpanded ? 'rotate-180' : 'rotate-0'
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -238,41 +269,56 @@ export default function AIAdoptionProgram() {
                   <div
                     className={`
                       overflow-hidden transition-all duration-500 ease-out
-                      ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+                      ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}
                     `}
                   >
                     <div className="px-8 pb-8">
-                      {/* Chips */}
+                      {/* We Do Section */}
                       <div className="mb-6">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                          You Get:
+                        <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
+                          We Do
+                        </h4>
+                        <div className="space-y-2">
+                          {stage.weDo.map((item, itemIndex) => (
+                            <p key={itemIndex} className="text-gray-900 text-sm leading-relaxed font-light">
+                              {item}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* You Get Section */}
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
+                          You Get
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {stage.chips.map((chip, chipIndex) => (
+                          {stage.youGet.map((item, itemIndex) => (
                             <span
-                              key={chipIndex}
-                              className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium"
+                              key={itemIndex}
+                              className="px-3 py-1 text-sm rounded-full font-medium"
+                              style={{
+                                backgroundColor: '#9C8B5E20',
+                                color: '#9C8B5E'
+                              }}
                             >
-                              {chip}
+                              {item}
                             </span>
                           ))}
                         </div>
                       </div>
 
-                      {/* CTA */}
-                      <div className="flex items-center justify-between">
-                        <a
-                          href={stage.ctaLink}
-                          className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                        >
-                          {stage.cta}
-                        </a>
-                        <a
-                          href={`/learn-more/${stage.label.toLowerCase()}`}
-                          className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors duration-200"
-                        >
-                          Learn more →
-                        </a>
+                      {/* Success Looks Like Section */}
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
+                          Success Looks Like
+                        </h4>
+                        <p className="text-gray-900 text-sm leading-relaxed font-light">
+                          {stage.successLooksLike}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -284,12 +330,13 @@ export default function AIAdoptionProgram() {
 
         {/* Bottom CTA */}
         <div className="text-center mt-16">
-          <p className="text-lg text-gray-600 mb-6">
+          <p className="text-lg text-gray-600 mb-6 font-light">
             Ready to start your AI transformation journey?
           </p>
           <a
-            href="/get-started"
-            className="inline-flex items-center px-8 py-4 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
+            href="#book-call"
+            className="inline-flex items-center px-8 py-4 text-white font-semibold rounded-lg hover:opacity-90 transition-colors duration-200"
+            style={{ backgroundColor: '#595F39' }}
           >
             Get Started Today
           </a>
