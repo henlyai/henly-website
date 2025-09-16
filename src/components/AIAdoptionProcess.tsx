@@ -243,7 +243,7 @@ export default function AIAdoptionProcess() {
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
-            scrollBehavior: 'smooth',
+            scrollBehavior: 'auto', // Override global smooth scroll
             WebkitScrollbar: { display: 'none' }
           }}
         >
