@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Stage {
   id: number;
@@ -68,7 +68,7 @@ export default function AIAdoptionProcess() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const scrollToStage = useCallback((stageId: number) => {
+  const scrollToStage = (stageId: number) => {
     if (!contentRef.current) return;
     
     const content = contentRef.current;
@@ -82,9 +82,9 @@ export default function AIAdoptionProcess() {
     });
     
     setActiveStage(stageId);
-  }, []);
+  };
 
-  const handleScroll = useCallback(() => {
+  const handleScroll = () => {
     if (!contentRef.current) return;
     
     const content = contentRef.current;
@@ -96,18 +96,19 @@ export default function AIAdoptionProcess() {
     if (newActiveStage !== activeStage) {
       setActiveStage(newActiveStage);
     }
-  }, [activeStage]);
+  };
 
-  const handleWheel = useCallback((e: WheelEvent) => {
+  const handleWheel = (e: WheelEvent) => {
     if (!sectionRef.current || !contentRef.current) return;
     
     const section = sectionRef.current;
     const rect = section.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
     
-    // Simple check: if section is in viewport
-    const isInSection = rect.top < 200 && rect.bottom > 200;
+    // Check if section is centered in viewport
+    const isCentered = rect.top <= viewportHeight / 2 && rect.bottom >= viewportHeight / 2;
     
-    if (isInSection) {
+    if (isCentered) {
       e.preventDefault();
       
       const content = contentRef.current;
@@ -132,7 +133,7 @@ export default function AIAdoptionProcess() {
       
       setActiveStage(targetStage + 1);
     }
-  }, []);
+  };
 
   useEffect(() => {
     const content = contentRef.current;
@@ -145,7 +146,7 @@ export default function AIAdoptionProcess() {
       content.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [handleScroll, handleWheel]);
+  }, [activeStage]);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
@@ -231,7 +232,6 @@ export default function AIAdoptionProcess() {
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
-            scrollBehavior: 'auto',
             WebkitScrollbar: { display: 'none' }
           }}
         >
