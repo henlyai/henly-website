@@ -76,10 +76,19 @@ export default function AIAdoptionProcess() {
     const stageWidth = content.scrollWidth / stages.length;
     const targetScrollLeft = stageIndex * stageWidth;
     
+    // Override global scroll behavior for this scroll
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    
     content.scrollTo({
       left: targetScrollLeft,
       behavior: 'smooth'
     });
+    
+    // Restore original scroll behavior after a short delay
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+    }, 100);
     
     setActiveStage(stageId);
   };
@@ -110,6 +119,7 @@ export default function AIAdoptionProcess() {
     
     if (isCentered) {
       e.preventDefault();
+      e.stopPropagation();
       
       const content = contentRef.current;
       const delta = e.deltaY;
@@ -126,10 +136,19 @@ export default function AIAdoptionProcess() {
       
       const targetScrollLeft = targetStage * stageWidth;
       
+      // Override global scroll behavior
+      const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      
       content.scrollTo({
         left: targetScrollLeft,
         behavior: 'smooth'
       });
+      
+      // Restore original scroll behavior
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      }, 100);
       
       setActiveStage(targetStage + 1);
     }
