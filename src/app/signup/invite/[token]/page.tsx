@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+// import Image from 'next/image' // Temporarily disabled due to conflict
 import { Eye, EyeOff, Loader2, Building2, Mail, Calendar, Shield, CheckCircle, XCircle } from 'lucide-react'
 
 interface InvitationData {
@@ -196,7 +196,7 @@ export default function InvitationSignupPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <Image src="/henly_ai_logo.png" alt="Henly AI Logo" width={120} height={30} className="h-12 w-auto mx-auto" />
+            <img src="/henly_ai_logo.png" alt="Henly AI Logo" width={120} height={30} className="h-12 w-auto mx-auto" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Complete Your Account
