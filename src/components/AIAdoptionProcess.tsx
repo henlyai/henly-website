@@ -80,9 +80,10 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Start horizontal scroll when section is fully in view (not 30%, but when it reaches the top)
-      const sectionStart = sectionTop - (windowHeight * 0.1); // Start when section is 10% from top
-      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.2); // End when section is 20% from bottom
+      // Start horizontal scroll when section is centered on page (so CTA below is visible)
+      // End horizontal scroll when section is almost at the bottom (so last stage is fully visible)
+      const sectionStart = sectionTop - (windowHeight * 0.5); // Start when section is centered
+      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.1); // End when section is 10% from bottom
       
       if (scrollY >= sectionStart && scrollY <= sectionEnd) {
         // Calculate progress through the section
@@ -128,8 +129,8 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - (windowHeight * 0.1);
-    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.2);
+    const sectionStart = sectionTop - (windowHeight * 0.5);
+    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.1);
     
     const progress = (stageId - 1) / (stages.length - 1);
     const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
@@ -149,7 +150,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 80}vh` }}
+      style={{ height: `${stages.length * 120}vh` }} // Increased from 80vh to 120vh for taller section
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
