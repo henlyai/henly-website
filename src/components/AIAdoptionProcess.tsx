@@ -65,15 +65,12 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const [isHorizontalMode, setIsHorizontalMode] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const isScrollingRef = useRef<boolean>(false);
 
   const scrollToStage = useCallback((stageId: number) => {
-    if (!contentRef.current || isScrollingRef.current) return;
+    if (!contentRef.current) return;
     
-    isScrollingRef.current = true;
     const content = contentRef.current;
     const stageIndex = stageId - 1;
     const stageWidth = content.scrollWidth / stages.length;
@@ -85,14 +82,10 @@ export default function AIAdoptionProcess() {
     });
     
     setActiveStage(stageId);
-    
-    setTimeout(() => {
-      isScrollingRef.current = false;
-    }, 500);
   }, []);
 
   const handleScroll = useCallback(() => {
-    if (!contentRef.current || isScrollingRef.current) return;
+    if (!contentRef.current) return;
     
     const content = contentRef.current;
     const scrollLeft = content.scrollLeft;
@@ -106,25 +99,17 @@ export default function AIAdoptionProcess() {
   }, [activeStage]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
-    if (!sectionRef.current || !contentRef.current || isScrollingRef.current) return;
+    if (!sectionRef.current || !contentRef.current) return;
     
     const section = sectionRef.current;
     const rect = section.getBoundingClientRect();
     
-    // Check if we're in the section
-    const isInSection = rect.top < 100 && rect.bottom > 100;
+    // Simple check: if section is in viewport
+    const isInSection = rect.top < 200 && rect.bottom > 200;
     
     if (isInSection) {
-      // ALWAYS prevent vertical scrolling when in section
       e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
       
-      if (!isHorizontalMode) {
-        setIsHorizontalMode(true);
-      }
-      
-      isScrollingRef.current = true;
       const content = contentRef.current;
       const delta = e.deltaY;
       const currentScrollLeft = content.scrollLeft;
@@ -146,51 +131,21 @@ export default function AIAdoptionProcess() {
       });
       
       setActiveStage(targetStage + 1);
-      
-      setTimeout(() => {
-        isScrollingRef.current = false;
-      }, 500);
-    } else if (isHorizontalMode) {
-      // Exit horizontal mode when not in section
-      setIsHorizontalMode(false);
     }
-  }, [isHorizontalMode]);
-
-  // Aggressive wheel event prevention
-  const preventAllWheel = useCallback((e: WheelEvent) => {
-    if (isHorizontalMode) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      return false;
-    }
-  }, [isHorizontalMode]);
+  }, []);
 
   useEffect(() => {
     const content = contentRef.current;
     if (!content) return;
 
-    // Override global scroll behavior
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-
     content.addEventListener('scroll', handleScroll);
-    
-    // Add multiple event listeners to catch all wheel events
-    document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-    document.addEventListener('wheel', preventAllWheel, { passive: false, capture: true });
-    window.addEventListener('wheel', preventAllWheel, { passive: false, capture: true });
-    document.body.addEventListener('wheel', preventAllWheel, { passive: false, capture: true });
+    window.addEventListener('wheel', handleWheel, { passive: false });
     
     return () => {
       content.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('wheel', handleWheel, { capture: true });
-      document.removeEventListener('wheel', preventAllWheel, { capture: true });
-      window.removeEventListener('wheel', preventAllWheel, { capture: true });
-      document.body.removeEventListener('wheel', preventAllWheel, { capture: true });
-      document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      window.removeEventListener('wheel', handleWheel);
     };
-  }, [handleScroll, handleWheel, preventAllWheel]);
+  }, [handleScroll, handleWheel]);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
