@@ -65,84 +65,85 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const [isScrolling, setIsScrolling] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isScrollingRef = useRef<boolean>(false);
 
   const scrollToStage = useCallback((stageId: number) => {
-    if (!contentRef.current) return;
+    if (!contentRef.current || isScrollingRef.current) return;
     
+    isScrollingRef.current = true;
     const content = contentRef.current;
     const stageIndex = stageId - 1;
     const stageWidth = content.scrollWidth / stages.length;
-    
-    // Calculate the scroll position for this stage
     const targetScrollLeft = stageIndex * stageWidth;
     
-    // Smooth scroll to the stage
     content.scrollTo({
       left: targetScrollLeft,
       behavior: 'smooth'
     });
     
     setActiveStage(stageId);
+    
+    // Reset scrolling flag after animation
+    setTimeout(() => {
+      isScrollingRef.current = false;
+    }, 500);
   }, []);
 
   const handleScroll = useCallback(() => {
-    if (!contentRef.current || isScrolling) return;
+    if (!contentRef.current || isScrollingRef.current) return;
     
     const content = contentRef.current;
     const scrollLeft = content.scrollLeft;
     const stageWidth = content.scrollWidth / stages.length;
-    
-    // Calculate which stage is currently visible
     const stageIndex = Math.round(scrollLeft / stageWidth);
     const newActiveStage = Math.min(Math.max(stageIndex + 1, 1), stages.length);
     
     if (newActiveStage !== activeStage) {
       setActiveStage(newActiveStage);
     }
-  }, [activeStage, isScrolling]);
+  }, [activeStage]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
-    if (!sectionRef.current || !contentRef.current) return;
+    if (!sectionRef.current || !contentRef.current || isScrollingRef.current) return;
     
     const section = sectionRef.current;
-    const content = contentRef.current;
     const rect = section.getBoundingClientRect();
     
-    // Check if we're in the section (more lenient bounds)
-    const isInSection = rect.top <= window.innerHeight * 0.5 && rect.bottom >= window.innerHeight * 0.5;
+    // Only activate when section is clearly visible
+    const isInSection = rect.top < 100 && rect.bottom > 100;
     
     if (isInSection) {
       e.preventDefault();
-      e.stopPropagation();
       
+      isScrollingRef.current = true;
+      const content = contentRef.current;
       const delta = e.deltaY;
       const currentScrollLeft = content.scrollLeft;
       const stageWidth = content.scrollWidth / stages.length;
       
-      // Calculate target stage
       let targetStage = Math.round(currentScrollLeft / stageWidth);
       
       if (delta > 0) {
-        // Scroll down - move to next stage
         targetStage = Math.min(targetStage + 1, stages.length - 1);
       } else {
-        // Scroll up - move to previous stage
         targetStage = Math.max(targetStage - 1, 0);
       }
       
       const targetScrollLeft = targetStage * stageWidth;
       
-      // Smooth scroll to target stage
       content.scrollTo({
         left: targetScrollLeft,
         behavior: 'smooth'
       });
       
       setActiveStage(targetStage + 1);
+      
+      // Reset scrolling flag after animation
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 500);
     }
   }, []);
 
@@ -150,10 +151,7 @@ export default function AIAdoptionProcess() {
     const content = contentRef.current;
     if (!content) return;
 
-    // Add scroll event listener
     content.addEventListener('scroll', handleScroll);
-    
-    // Add wheel event listener for scroll-jacking
     window.addEventListener('wheel', handleWheel, { passive: false });
     
     return () => {
@@ -246,7 +244,7 @@ export default function AIAdoptionProcess() {
           style={{ 
             scrollbarWidth: 'none', 
             msOverflowStyle: 'none',
-            scrollBehavior: 'auto', // Override global smooth scroll
+            scrollBehavior: 'auto',
             WebkitScrollbar: { display: 'none' }
           }}
         >
