@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
+import { sendVerificationEmail } from '@/lib/email-service'
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, fullName, password, email } = await request.json()
+    const { token, fullName, password, email, username } = await request.json()
 
     // Validate input
-    if (!token || !fullName || !password || !email) {
+    if (!token || !fullName || !password || !email || !username) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -92,13 +93,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user account with email already confirmed
+    // Create user account with email confirmation required
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Auto-confirm email for invited users
+      email_confirm: false, // Require email verification
       user_metadata: {
-        full_name: fullName
+        full_name: fullName,
+        username: username
       }
     })
 
@@ -129,14 +131,15 @@ export async function POST(request: NextRequest) {
       id: userId,
       full_name: fullName,
       email,
+      username: username,
       organization_id: organizationId,
       role: invitationData.role, // Use the role from the invitation
-      is_verified: true, // Auto-verify invited users
-      email_verification_required: false, // No verification needed for invited users
+      is_verified: false, // Require email verification
+      email_verification_required: true, // Require verification for invited users
       is_active: true,
-      status: 'active',
-      onboarding_step: 'completed',
-      profile_completion_percentage: 100,
+      status: 'pending_verification',
+      onboarding_step: 'email_verification',
+      profile_completion_percentage: 80,
       invitation_accepted_at: new Date().toISOString(),
       last_activity_at: new Date().toISOString(),
       invitation_status: 'accepted',
@@ -206,17 +209,43 @@ export async function POST(request: NextRequest) {
       console.log('Invitation status updated to accepted')
     }
 
-    // Don't generate magic link - let user log in manually after profile creation
-    // This ensures the profile exists before the user tries to access the dashboard
+    // Send verification email
+    let emailSent = false
+    let emailError: string | null = null
+
+    try {
+      const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${userData.user.email_confirmation_token}&type=signup`
+      
+      const emailResult = await sendVerificationEmail({
+        to: email,
+        verificationUrl,
+        fullName: fullName,
+        organizationName: organizationName
+      })
+
+      if (emailResult.success) {
+        emailSent = true
+        console.log('Verification email sent successfully')
+      } else {
+        emailError = emailResult.error || 'Failed to send verification email'
+        console.error('Failed to send verification email:', emailError)
+      }
+    } catch (emailErr) {
+      emailError = emailErr instanceof Error ? emailErr.message : 'Unknown email error'
+      console.error('Error sending verification email:', emailErr)
+    }
+
     console.log('Profile creation completed successfully for user:', userId)
 
     return NextResponse.json({
-      message: 'User account and profile created successfully. Please log in to continue.',
+      message: 'User account and profile created successfully. Please check your email to verify your account.',
       userId,
       organizationId: organizationId,
       organizationName: organizationName,
       profileId: (createdProfile as any).id,
-      redirectUrl: '/login',
+      emailSent,
+      emailError,
+      redirectUrl: '/verify-email-pending',
       success: true
     })
 

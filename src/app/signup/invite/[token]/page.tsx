@@ -2,16 +2,9 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { 
-  CheckCircle, 
-  XCircle, 
-  Loader2, 
-  UserPlus, 
-  Building2,
-  Mail,
-  Lock,
-  User
-} from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Eye, EyeOff, Loader2, Building2, Mail, Calendar, Shield, CheckCircle, XCircle } from 'lucide-react'
 
 interface InvitationData {
   id: string
@@ -20,6 +13,7 @@ interface InvitationData {
   inviterName: string
   expiresAt: string
   status: 'pending' | 'accepted' | 'expired'
+  role: 'user' | 'admin'
 }
 
 export default function InvitationSignupPage() {
@@ -28,16 +22,17 @@ export default function InvitationSignupPage() {
   const [invitation, setInvitation] = useState<InvitationData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [signingUp, setSigningUp] = useState(false)
-  const [success, setSuccess] = useState(false)
-
-  // Form state
   const [formData, setFormData] = useState({
-    fullName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    fullName: '',
+    username: '',
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const token = params.token as string
 
@@ -52,7 +47,6 @@ export default function InvitationSignupPage() {
       setLoading(true)
       setError(null)
 
-      // Call the actual API to validate invitation
       const response = await fetch(`/api/validate-invitation?token=${token}`)
       
       if (!response.ok) {
@@ -66,28 +60,28 @@ export default function InvitationSignupPage() {
       // Check if invitation is expired
       if (new Date(invitationData.expires_at) < new Date()) {
         setError('This invitation has expired. Please request a new invitation.')
+        setInvitation({ ...invitationData, status: 'expired' })
         return
       }
 
-      const invitation = {
+      setInvitation({
         id: invitationData.id,
         email: invitationData.email,
         organizationName: invitationData.organization_name,
         inviterName: invitationData.inviter_name || 'Team Admin',
         expiresAt: invitationData.expires_at,
-        status: invitationData.status
-      }
+        status: invitationData.status,
+        role: invitationData.role || 'user'
+      })
 
-      setInvitation(invitation)
-      // Pre-fill the form with invitation data
-      setFormData(prev => ({ 
-        ...prev, 
-        fullName: invitation.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        email: invitation.email
+      // Pre-fill the email from the invitation
+      setFormData(prev => ({
+        ...prev,
+        email: invitationData.email
       }))
     } catch (err) {
       console.error('Error validating invitation:', err)
-      setError('Failed to validate invitation. Please try again.')
+      setError('Invalid or expired invitation link.')
     } finally {
       setLoading(false)
     }
@@ -95,32 +89,37 @@ export default function InvitationSignupPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!invitation) {
-      setError('Invalid invitation')
-      return
-    }
+    setSubmitting(true)
+    setSubmitError('')
 
+    // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
+      setSubmitError('Passwords do not match')
+      setSubmitting(false)
       return
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setSubmitError('Password must be at least 6 characters long')
+      setSubmitting(false)
+      return
+    }
+
+    if (!formData.username.trim()) {
+      setSubmitError('Username is required')
+      setSubmitting(false)
       return
     }
 
     try {
-      setSigningUp(true)
-      setError(null)
-
-      // TODO: Call invitation signup API
       const response = await fetch('/api/signup-invitation', {
         method: 'POST',
         headers: {
@@ -128,41 +127,43 @@ export default function InvitationSignupPage() {
         },
         body: JSON.stringify({
           token,
-          fullName: formData.fullName,
+          email: formData.email,
           password: formData.password,
-          email: formData.email
+          fullName: formData.fullName,
+          username: formData.username,
         }),
       })
 
       const result = await response.json()
 
-      if (response.ok) {
-        setSuccess(true)
-        
-        // Show success message and redirect to login
-        console.log('Account created successfully:', result.message)
-        
-        // Redirect to login page after a short delay
-        setTimeout(() => {
-          router.push('/login')
-        }, 2000)
-      } else {
-        setError(result.error || 'Failed to create account')
+      if (!response.ok) {
+        setSubmitError(result.error || 'Failed to create account')
+        setSubmitting(false)
+        return
       }
-    } catch (err) {
-      console.error('Error creating account:', err)
-      setError('Failed to create account. Please try again.')
-    } finally {
-      setSigningUp(false)
+
+      // Success! Redirect to verification pending page
+      if (result.emailSent) {
+        router.push(`/verify-email-pending?email=${encodeURIComponent(formData.email)}&org=${encodeURIComponent(invitation?.organizationName || '')}&invitation=true`)
+      } else {
+        // If no email was sent (development mode), go directly to dashboard
+        router.push('/dashboard')
+      }
+      
+    } catch (error) {
+      console.error('Signup error:', error)
+      setSubmitError('An unexpected error occurred')
+      setSubmitting(false)
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="mx-auto mb-4" style={{ color: "#595F39" }} />
-          <p className="text-gray-600">Validating invitation...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{ color: "#595F39" }} />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Validating Invitation</h2>
+          <p className="text-gray-600">Please wait while we verify your invitation...</p>
         </div>
       </div>
     )
@@ -170,14 +171,14 @@ export default function InvitationSignupPage() {
 
   if (error && !invitation) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
-          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid Invitation</h1>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Invalid Invitation</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => router.push('/')}
-            className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
+            className="text-white py-2 px-4 rounded-md hover:opacity-90 transition-colors" style={{ backgroundColor: "#595F39" }}
           >
             Go to Homepage
           </button>
@@ -186,171 +187,205 @@ export default function InvitationSignupPage() {
     )
   }
 
-           if (success) {
-           return (
-             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-               <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
-                 <CheckCircle className="mx-auto mb-4" style={{ color: "#595F39" }} />
-                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to {invitation?.organizationName}!</h1>
-                 <p className="text-gray-600 mb-4">
-                   Your account has been created successfully. Please log in to access your dashboard.
-                 </p>
-                 <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: "rgba(89, 95, 57, 0.1)", borderColor: "rgba(89, 95, 57, 0.3)" }}>
-                   <p style={{ color: "rgba(89, 95, 57, 0.8)" }}>
-                     <strong>Success!</strong> You're now a member of {invitation?.organizationName} and have access to all AI tools and features.
-                   </p>
-                 </div>
-                 <p className="text-sm text-gray-500">
-                   Redirecting you to the login page...
-                 </p>
-               </div>
-             </div>
-           )
-         }
+  if (!invitation) {
+    return null
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <UserPlus className="mx-auto mb-4" style={{ color: "#595F39" }} />
-          <h2 className="text-3xl font-bold text-gray-900">Join {invitation?.organizationName}</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            You've been invited by {invitation?.inviterName}
+          <div className="flex justify-center">
+            <Image src="/henly_ai_logo.png" alt="Henly AI Logo" width={120} height={30} className="h-12 w-auto mx-auto" />
+          </div>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Complete Your Account
+          </h2>
+          <p className="mt-2 text-sm text-gray-800">
+            You've been invited to join <strong>{invitation.organizationName}</strong>
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="rounded-lg" style={{ backgroundColor: "rgba(89, 95, 57, 0.1)", borderColor: "rgba(89, 95, 57, 0.3)" }}>
-            <div className="flex items-center mb-3">
-              <Building2 className="mr-2" style={{ color: "#595F39" }} />
-              <span style={{ color: "rgba(89, 95, 57, 0.9)" }}>Invitation Details</span>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span style={{ color: "rgba(89, 95, 57, 0.8)" }}>Organization:</span>
-                <span style={{ color: "rgba(89, 95, 57, 0.8)" }}>{invitation?.organizationName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span style={{ color: "rgba(89, 95, 57, 0.8)" }}>Email:</span>
-                <span style={{ color: "rgba(89, 95, 57, 0.8)" }}>{invitation?.email}</span>
-              </div>
-              <div className="flex justify-between">
-                <span style={{ color: "rgba(89, 95, 57, 0.8)" }}>Invited by:</span>
-                <span style={{ color: "rgba(89, 95, 57, 0.8)" }}>{invitation?.inviterName}</span>
-              </div>
+        {/* Invitation Details */}
+        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <div className="flex items-center space-x-3">
+            <Building2 className="h-5 w-5 text-gray-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">Organization</p>
+              <p className="text-sm text-gray-600">{invitation.organizationName}</p>
             </div>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <Mail className="h-5 w-5 text-gray-500" />
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  readOnly
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 cursor-not-allowed"
-                  placeholder="Email address from invitation"
-                />
-              </div>
-              <p className="text-xs text-gray-500 mt-1">This email is from your invitation and cannot be changed</p>
+              <p className="text-sm font-medium text-gray-900">Invited by</p>
+              <p className="text-sm text-gray-600">{invitation.inviterName}</p>
             </div>
+          </div>
 
+          <div className="flex items-center space-x-3">
+            <Calendar className="h-5 w-5 text-gray-500" />
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+              <p className="text-sm font-medium text-gray-900">Expires</p>
+              <p className="text-sm text-gray-600">
+                {new Date(invitation.expiresAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <Shield className="h-5 w-5 text-gray-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">Role</p>
+              <p className="text-sm text-gray-600 capitalize">{invitation.role}</p>
+            </div>
+          </div>
+        </div>
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-900">
                 Full Name
               </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#595F39] focus:border-transparent"
-                  placeholder="Enter your full name"
-                />
-              </div>
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#595F39] focus:border-[#595F39]"
+                placeholder="Your full name"
+              />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-900">
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={formData.username}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#595F39] focus:border-[#595F39]"
+                placeholder="Choose a username"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#595F39] focus:border-[#595F39] bg-gray-50"
+                placeholder="Enter your email"
+                disabled
+              />
+              <p className="mt-1 text-xs text-gray-500">This email was provided in your invitation</p>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900">
                 Password
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <div className="mt-1 relative">
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#595F39] focus:border-transparent"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#595F39] focus:border-[#595F39] pr-10"
                   placeholder="Create a password"
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-900">
                 Confirm Password
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <div className="mt-1 relative">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#595F39] focus:border-transparent"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#595F39] focus:border-[#595F39] pr-10"
                   placeholder="Confirm your password"
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
             </div>
+          </div>
 
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+              {submitError}
+            </div>
+          )}
+
+          <div>
             <button
               type="submit"
-              disabled={signingUp}
-              className="text-white py-2 px-4 rounded-md hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center" style={{ backgroundColor: "#595F39" }}
+              disabled={submitting}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#595F39] disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: "#595F39" }}
             >
-              {signingUp ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Creating Account...
-                </>
+              {submitting ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <>
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Join Organization
-                </>
+                'Complete Account Setup'
               )}
             </button>
-          </form>
+          </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              By creating an account, you agree to join {invitation?.organizationName} and 
-              abide by their terms and policies.
+          <div className="text-center">
+            <p className="text-sm text-gray-800">
+              Already have an account?{' '}
+              <Link href="/login" className="font-medium hover:opacity-80" style={{ color: "#595F39" }}>
+                Sign in
+              </Link>
             </p>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   )
