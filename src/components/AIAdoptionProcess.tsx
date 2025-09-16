@@ -68,6 +68,7 @@ export default function AIAdoptionProcess() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isScrollingRef = useRef<boolean>(false);
+  const isInHorizontalModeRef = useRef<boolean>(false);
 
   const scrollToStage = useCallback((stageId: number) => {
     if (!contentRef.current || isScrollingRef.current) return;
@@ -111,13 +112,16 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const rect = section.getBoundingClientRect();
     
-    // Only activate when section is clearly visible
+    // Check if we're in the section
     const isInSection = rect.top < 100 && rect.bottom > 100;
     
     if (isInSection) {
       e.preventDefault();
+      e.stopPropagation();
       
       isScrollingRef.current = true;
+      isInHorizontalModeRef.current = true;
+      
       const content = contentRef.current;
       const delta = e.deltaY;
       const currentScrollLeft = content.scrollLeft;
@@ -143,7 +147,16 @@ export default function AIAdoptionProcess() {
       // Reset scrolling flag after animation
       setTimeout(() => {
         isScrollingRef.current = false;
+        isInHorizontalModeRef.current = false;
       }, 500);
+    }
+  }, []);
+
+  const handleGlobalWheel = useCallback((e: WheelEvent) => {
+    // If we're in horizontal mode, prevent all vertical scrolling
+    if (isInHorizontalModeRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
     }
   }, []);
 
@@ -153,12 +166,14 @@ export default function AIAdoptionProcess() {
 
     content.addEventListener('scroll', handleScroll);
     window.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('wheel', handleGlobalWheel, { passive: false });
     
     return () => {
       content.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('wheel', handleGlobalWheel);
     };
-  }, [handleScroll, handleWheel]);
+  }, [handleScroll, handleWheel, handleGlobalWheel]);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
