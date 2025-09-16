@@ -5,10 +5,10 @@ import { sendVerificationEmail } from '@/lib/email-service'
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, fullName, password, email, username } = await request.json()
+    const { token, fullName, password, email } = await request.json()
 
     // Validate input
-    if (!token || !fullName || !password || !email || !username) {
+    if (!token || !fullName || !password || !email) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -99,8 +99,7 @@ export async function POST(request: NextRequest) {
       password,
       email_confirm: false, // Require email verification
       user_metadata: {
-        full_name: fullName,
-        username: username
+        full_name: fullName
       }
     })
 
@@ -131,7 +130,6 @@ export async function POST(request: NextRequest) {
       id: userId,
       full_name: fullName,
       email,
-      username: username,
       organization_id: organizationId,
       role: invitationData.role, // Use the role from the invitation
       is_verified: false, // Require email verification
