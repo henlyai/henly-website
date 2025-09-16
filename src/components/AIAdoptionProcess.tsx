@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Stage {
   id: number;
@@ -65,44 +65,103 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState<boolean>(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const scrollToStage = (stageId: number) => {
-    if (!containerRef.current) return;
+  const scrollToStage = useCallback((stageId: number) => {
+    if (!sectionRef.current || !contentRef.current) return;
     
-    const stageElement = containerRef.current.children[stageId - 1] as HTMLElement;
-    if (stageElement) {
-      stageElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'start'
-      });
-    }
-  };
-
-  const handleScroll = () => {
-    if (!containerRef.current) return;
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const stageIndex = stageId - 1;
+    const stageWidth = content.scrollWidth / stages.length;
     
-    const container = containerRef.current;
-    const scrollLeft = container.scrollLeft;
-    const containerWidth = container.clientWidth;
+    // Calculate the scroll position for this stage
+    const targetScrollLeft = stageIndex * stageWidth;
     
-    // Calculate which stage is currently visible
-    const stageIndex = Math.round(scrollLeft / containerWidth);
-    const newActiveStage = Math.min(stageIndex + 1, stages.length);
-    setActiveStage(newActiveStage);
-  };
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    // Smooth scroll to the stage
+    content.scrollTo({
+      left: targetScrollLeft,
+      behavior: 'smooth'
+    });
+    
+    setActiveStage(stageId);
   }, []);
 
+  const handleScroll = useCallback(() => {
+    if (!contentRef.current || isScrolling) return;
+    
+    const content = contentRef.current;
+    const scrollLeft = content.scrollLeft;
+    const stageWidth = content.scrollWidth / stages.length;
+    
+    // Calculate which stage is currently visible
+    const stageIndex = Math.round(scrollLeft / stageWidth);
+    const newActiveStage = Math.min(Math.max(stageIndex + 1, 1), stages.length);
+    
+    if (newActiveStage !== activeStage) {
+      setActiveStage(newActiveStage);
+    }
+  }, [activeStage, isScrolling]);
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (!sectionRef.current || !contentRef.current) return;
+    
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const rect = section.getBoundingClientRect();
+    
+    // Check if we're in the section
+    if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
+      e.preventDefault();
+      
+      const delta = e.deltaY;
+      const currentScrollLeft = content.scrollLeft;
+      const stageWidth = content.scrollWidth / stages.length;
+      
+      // Calculate target stage
+      let targetStage = Math.round(currentScrollLeft / stageWidth);
+      
+      if (delta > 0) {
+        // Scroll down - move to next stage
+        targetStage = Math.min(targetStage + 1, stages.length - 1);
+      } else {
+        // Scroll up - move to previous stage
+        targetStage = Math.max(targetStage - 1, 0);
+      }
+      
+      const targetScrollLeft = targetStage * stageWidth;
+      
+      // Smooth scroll to target stage
+      content.scrollTo({
+        left: targetScrollLeft,
+        behavior: 'smooth'
+      });
+      
+      setActiveStage(targetStage + 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
+    // Add scroll event listener
+    content.addEventListener('scroll', handleScroll);
+    
+    // Add wheel event listener for scroll-jacking
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    
+    return () => {
+      content.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, [handleScroll, handleWheel]);
+
   return (
-    <section className="py-24 bg-white relative" id="ai-adoption-process">
+    <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
@@ -180,7 +239,7 @@ export default function AIAdoptionProcess() {
 
         {/* Horizontal Scroll Container */}
         <div 
-          ref={containerRef}
+          ref={contentRef}
           className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
           style={{ 
             scrollbarWidth: 'none', 
