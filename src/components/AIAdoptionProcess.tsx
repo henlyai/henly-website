@@ -59,7 +59,7 @@ const stages: Stage[] = [
     weDo: ['Monthly check-ins', 'Emerging tech evaluation', 'Performance monitoring', 'Advanced training', 'New use cases', 'ROI assessment'],
     youGet: ['Monthly status reports', 'Emerging tech briefs', 'Continuous improvement recs', 'Updated roadmap', 'Quarterly ROI analysis'],
     successLooksLike: 'Steady capability gains, responsible adoption, clear ROI to leadership.',
-    timeline: 'Ongoing (monthly/quarterly)'
+    timeline: 'Monthly'
   }
 ];
 
@@ -80,8 +80,8 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Adjust scroll zone - start horizontal scroll when section is more in view
-      const sectionStart = sectionTop - (windowHeight * 0.3); // Start when section is 30% in view
+      // Start horizontal scroll when section is fully in view (not 30%, but when it reaches the top)
+      const sectionStart = sectionTop - (windowHeight * 0.1); // Start when section is 10% from top
       const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.2); // End when section is 20% from bottom
       
       if (scrollY >= sectionStart && scrollY <= sectionEnd) {
@@ -128,7 +128,7 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - (windowHeight * 0.3);
+    const sectionStart = sectionTop - (windowHeight * 0.1);
     const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.2);
     
     const progress = (stageId - 1) / (stages.length - 1);
@@ -149,7 +149,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 80}vh` }} // Reduced from 100vh to 80vh for tighter spacing
+      style={{ height: `${stages.length * 80}vh` }}
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
@@ -242,7 +242,7 @@ export default function AIAdoptionProcess() {
               {stages.map((stage) => (
                 <div 
                   key={stage.id}
-                  className="w-full flex-shrink-0 px-6 pb-8" // Reduced pb from 20 to 8
+                  className="w-full flex-shrink-0 px-6 pb-8"
                 >
                   <div className="max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -359,22 +359,6 @@ export default function AIAdoptionProcess() {
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* CTA - Fixed at bottom without scroll effect */}
-      <div className="bg-white py-16 px-6 border-t border-gray-100">
-        <div className="text-center">
-          <p className="text-lg text-gray-600 mb-6 font-light">
-            Ready to start your AI transformation journey?
-          </p>
-          <a
-            href="#book-call"
-            className="inline-flex items-center px-8 py-4 text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            style={{ backgroundColor: '#595F39' }}
-          >
-            Get Started Today
-          </a>
         </div>
       </div>
     </section>
