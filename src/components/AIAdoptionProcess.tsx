@@ -112,9 +112,12 @@ export default function AIAdoptionProcess() {
     const content = contentRef.current;
     const rect = section.getBoundingClientRect();
     
-    // Check if we're in the section
-    if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
+    // Check if we're in the section (more lenient bounds)
+    const isInSection = rect.top <= window.innerHeight * 0.5 && rect.bottom >= window.innerHeight * 0.5;
+    
+    if (isInSection) {
       e.preventDefault();
+      e.stopPropagation();
       
       const delta = e.deltaY;
       const currentScrollLeft = content.scrollLeft;
