@@ -1,6 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger plugin
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface Stage {
   id: number;
@@ -67,90 +74,71 @@ export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    let ticking = false;
+    if (!sectionRef.current || !contentRef.current) return;
 
-    const updateScroll = () => {
-      if (!sectionRef.current || !contentRef.current) return;
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const stageElements = stageRefs.current.filter(Boolean);
 
-      const section = sectionRef.current;
-      const sectionTop = section.offsetTop;
-      const sectionHeight = section.offsetHeight;
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
+    // Calculate the total width of all stages
+    const totalWidth = stageElements.reduce((sum, stage) => sum + stage.offsetWidth, 0);
+    const viewportWidth = window.innerWidth;
+    const scrollDistance = totalWidth - viewportWidth;
 
-      // Add buffers/delays for smooth transitions:
-      // Buffer at start: wait until section is fully in view before starting horizontal scroll
-      // Buffer at end: complete horizontal scroll before allowing vertical to continue
-      const bufferStart = windowHeight * 0.3; // 30% buffer at start
-      const bufferEnd = windowHeight * 0.2;   // 20% buffer at end
-      
-      const sectionStart = sectionTop - bufferStart; // Start horizontal scroll with buffer
-      const sectionEnd = sectionTop + sectionHeight - bufferEnd; // End horizontal scroll with buffer
-      
-      if (scrollY >= sectionStart && scrollY <= sectionEnd) {
-        // Calculate progress through the horizontal scroll zone
-        const progress = (scrollY - sectionStart) / (sectionEnd - sectionStart);
-        const clampedProgress = Math.max(0, Math.min(1, progress));
-        
-        // Update active stage
-        const stageIndex = Math.floor(clampedProgress * stages.length);
-        const newActiveStage = Math.min(stageIndex + 1, stages.length);
-        setActiveStage(newActiveStage);
-        
-        // Update horizontal scroll position
-        const maxScroll = contentRef.current.scrollWidth - contentRef.current.clientWidth;
-        const targetScroll = clampedProgress * maxScroll;
-        
-        // Use requestAnimationFrame for smooth updates
-        requestAnimationFrame(() => {
-          if (contentRef.current) {
-            contentRef.current.scrollLeft = targetScroll;
-          }
-        });
+    // Create GSAP ScrollTrigger for horizontal scrolling
+    const horizontalScroll = gsap.to(content, {
+      x: -scrollDistance,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        pin: true,
+        start: 'top top',
+        end: () => `+=${scrollDistance}`,
+        scrub: 1,
+        onUpdate: (self) => {
+          // Calculate which stage is currently active based on scroll progress
+          const progress = self.progress;
+          const stageIndex = Math.floor(progress * stages.length);
+          const newActiveStage = Math.min(stageIndex + 1, stages.length);
+          setActiveStage(newActiveStage);
+        }
       }
-      
-      ticking = false;
+    });
+
+    // Cleanup function
+    return () => {
+      horizontalScroll.kill();
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger === section) {
+          trigger.kill();
+        }
+      });
     };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(updateScroll);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    updateScroll(); // Initial call
-
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToStage = (stageId: number) => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !contentRef.current) return;
 
     const section = sectionRef.current;
-    const sectionTop = section.offsetTop;
-    const sectionHeight = section.offsetHeight;
-    const windowHeight = window.innerHeight;
-    const bufferStart = windowHeight * 0.3;
-    const bufferEnd = windowHeight * 0.2;
+    const content = contentRef.current;
+    const stageElements = stageRefs.current.filter(Boolean);
     
-    const sectionStart = sectionTop - bufferStart;
-    const sectionEnd = sectionTop + sectionHeight - bufferEnd;
+    // Calculate the total width and target position
+    const totalWidth = stageElements.reduce((sum, stage) => sum + stage.offsetWidth, 0);
+    const viewportWidth = window.innerWidth;
+    const scrollDistance = totalWidth - viewportWidth;
     
-    const progress = (stageId - 1) / (stages.length - 1);
-    const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
+    // Calculate target scroll position
+    const targetProgress = (stageId - 1) / (stages.length - 1);
+    const targetScrollY = section.offsetTop + (targetProgress * scrollDistance);
     
-    // Temporarily disable smooth scrolling for this action
-    document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, targetScrollY);
-    
-    // Re-enable smooth scrolling after a short delay
-    setTimeout(() => {
-      document.documentElement.style.scrollBehavior = 'smooth';
-    }, 100);
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -158,7 +146,6 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 150}vh` }}
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
@@ -238,20 +225,17 @@ export default function AIAdoptionProcess() {
           </div>
 
           {/* Content */}
-          <div className="relative">
+          <div className="relative overflow-hidden">
             <div 
               ref={contentRef}
-              className="flex overflow-x-auto scrollbar-hide"
-              style={{ 
-                scrollbarWidth: 'none', 
-                msOverflowStyle: 'none',
-                scrollBehavior: 'auto' // Override global smooth scrolling
-              }}
+              className="flex"
+              style={{ width: 'fit-content' }}
             >
-              {stages.map((stage) => (
+              {stages.map((stage, index) => (
                 <div 
                   key={stage.id}
-                  className="w-full flex-shrink-0 px-6 pb-8"
+                  ref={(el) => (stageRefs.current[index] = el)}
+                  className="w-screen flex-shrink-0 px-6 pb-8"
                 >
                   <div className="max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
