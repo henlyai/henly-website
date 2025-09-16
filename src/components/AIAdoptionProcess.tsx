@@ -72,7 +72,6 @@ export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
   const scrollToStage = (stageId: number) => {
     if (!contentRef.current) return;
@@ -113,24 +112,24 @@ export default function AIAdoptionProcess() {
     // Get all stage elements
     const stageElements = content.querySelectorAll('.stage-panel');
     
+    // Calculate the total width of all stages
+    const totalWidth = stageElements.length * window.innerWidth;
+    
+    // Set the content width to accommodate all stages
+    gsap.set(content, { width: totalWidth });
+    
     // Create horizontal scroll animation using GSAP ScrollTrigger
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         pin: true,
         start: "top top",
-        end: () => `+=${content.scrollWidth - window.innerWidth}`,
+        end: `+=${totalWidth - window.innerWidth}`,
         scrub: 1,
         snap: {
           snapTo: 1 / (stages.length - 1),
           duration: { min: 0.2, max: 1 },
-          delay: 0.1,
-          onComplete: () => {
-            // Update active stage when snap completes
-            const progress = scrollTriggerRef.current?.progress || 0;
-            const stageIndex = Math.round(progress * (stages.length - 1));
-            setActiveStage(stageIndex + 1);
-          }
+          delay: 0.1
         },
         onUpdate: (self) => {
           // Update active stage during scroll
@@ -147,12 +146,9 @@ export default function AIAdoptionProcess() {
 
     // Animate horizontal movement
     tl.to(content, {
-      x: () => -(content.scrollWidth - window.innerWidth),
+      x: -(totalWidth - window.innerWidth),
       ease: "none"
     });
-
-    // Store ScrollTrigger reference for cleanup
-    scrollTriggerRef.current = ScrollTrigger.getById(tl.scrollTrigger?.id || '');
 
     // Add scroll listener for click navigation
     content.addEventListener('scroll', handleScroll);
