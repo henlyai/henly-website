@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 
 interface Stage {
   id: number;
@@ -65,105 +65,13 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
-  const [isHorizontalMode, setIsHorizontalMode] = useState<boolean>(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const isScrollingRef = useRef<boolean>(false);
 
   const scrollToStage = (stageId: number) => {
-    if (!contentRef.current || isScrollingRef.current) return;
-    
-    isScrollingRef.current = true;
-    
-    const content = contentRef.current;
-    const stageIndex = stageId - 1;
-    const stageWidth = content.scrollWidth / stages.length;
-    const targetScrollLeft = stageIndex * stageWidth;
-    
-    content.scrollTo({
-      left: targetScrollLeft,
-      behavior: 'smooth'
-    });
-    
     setActiveStage(stageId);
-    
-    setTimeout(() => {
-      isScrollingRef.current = false;
-    }, 500);
   };
-
-  const handleScroll = () => {
-    if (!contentRef.current || isScrollingRef.current) return;
-    
-    const content = contentRef.current;
-    const scrollLeft = content.scrollLeft;
-    const stageWidth = content.scrollWidth / stages.length;
-    const stageIndex = Math.round(scrollLeft / stageWidth);
-    const newActiveStage = Math.min(Math.max(stageIndex + 1, 1), stages.length);
-    
-    if (newActiveStage !== activeStage) {
-      setActiveStage(newActiveStage);
-    }
-  };
-
-  const handleWheel = (e: WheelEvent) => {
-    if (!sectionRef.current || !contentRef.current || isScrollingRef.current) return;
-    
-    const section = sectionRef.current;
-    const rect = section.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    
-    // Check if section is in viewport (centered)
-    const isInSection = rect.top <= viewportHeight * 0.5 && rect.bottom >= viewportHeight * 0.5;
-    
-    if (isInSection) {
-      e.preventDefault();
-      
-      if (!isHorizontalMode) {
-        setIsHorizontalMode(true);
-      }
-      
-      const content = contentRef.current;
-      const delta = e.deltaY;
-      const currentScrollLeft = content.scrollLeft;
-      const stageWidth = content.scrollWidth / stages.length;
-      
-      let targetStage = Math.round(currentScrollLeft / stageWidth);
-      
-      if (delta > 0) {
-        targetStage = Math.min(targetStage + 1, stages.length - 1);
-      } else {
-        targetStage = Math.max(targetStage - 1, 0);
-      }
-      
-      const targetScrollLeft = targetStage * stageWidth;
-      
-      content.scrollTo({
-        left: targetScrollLeft,
-        behavior: 'smooth'
-      });
-      
-      setActiveStage(targetStage + 1);
-    } else if (isHorizontalMode) {
-      setIsHorizontalMode(false);
-    }
-  };
-
-  useEffect(() => {
-    const content = contentRef.current;
-    if (!content) return;
-
-    content.addEventListener('scroll', handleScroll);
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    
-    return () => {
-      content.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [isHorizontalMode]);
 
   return (
-    <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
+    <section className="py-24 bg-white relative" id="ai-adoption-process">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
@@ -239,117 +147,130 @@ export default function AIAdoptionProcess() {
           </div>
         </div>
 
-        {/* Horizontal Scroll Container */}
-        <div 
-          ref={contentRef}
-          className="flex overflow-x-auto snap-x snap-mandatory"
-          style={{ 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none',
-            WebkitScrollbar: { display: 'none' }
-          }}
-        >
-          {stages.map((stage) => (
-            <div 
-              key={stage.id}
-              className="w-full flex-shrink-0 snap-start px-6"
-            >
-              <div className="max-w-6xl mx-auto">
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                  {/* Left Side */}
-                  <div className="space-y-8">
-                    <div>
-                      <h3 className="text-3xl font-medium text-gray-900 mb-4">
-                        {stage.label}
-                      </h3>
-                      <p className="text-lg text-gray-600 font-light leading-relaxed">
-                        {stage.purpose}
-                      </p>
-                    </div>
+        {/* Stage Content */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Side */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-3xl font-medium text-gray-900 mb-4">
+                  {stages[activeStage - 1].label}
+                </h3>
+                <p className="text-lg text-gray-600 font-light leading-relaxed">
+                  {stages[activeStage - 1].purpose}
+                </p>
+              </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                          Timeline
-                        </span>
-                        <span 
-                          className="px-3 py-1 text-sm font-medium rounded-full"
-                          style={{
-                            backgroundColor: '#9C8B5E',
-                            color: 'white'
-                          }}
-                        >
-                          {stage.timeline}
-                        </span>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#595F39' }} />
-                          <span className="text-sm text-gray-600">
-                            {stage.weDo.length} key activities
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#9C8B5E' }} />
-                          <span className="text-sm text-gray-600">
-                            {stage.youGet.length} deliverables
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+              <div className="bg-gray-50 rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                    Timeline
+                  </span>
+                  <span 
+                    className="px-3 py-1 text-sm font-medium rounded-full"
+                    style={{
+                      backgroundColor: '#9C8B5E',
+                      color: 'white'
+                    }}
+                  >
+                    {stages[activeStage - 1].timeline}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#595F39' }} />
+                    <span className="text-sm text-gray-600">
+                      {stages[activeStage - 1].weDo.length} key activities
+                    </span>
                   </div>
-
-                  {/* Right Side */}
-                  <div className="space-y-8">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
-                        <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                        We Do
-                      </h4>
-                      <div className="space-y-3">
-                        {stage.weDo.map((item, itemIndex) => (
-                          <p key={itemIndex} className="text-gray-600 leading-relaxed font-light">
-                            {item}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
-                        <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
-                        You Get
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {stage.youGet.map((item, itemIndex) => (
-                          <span
-                            key={itemIndex}
-                            className="px-3 py-1 text-sm rounded-full font-medium"
-                            style={{
-                              backgroundColor: '#9C8B5E20',
-                              color: '#9C8B5E'
-                            }}
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
-                        <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                        Success Looks Like
-                      </h4>
-                      <p className="text-gray-600 leading-relaxed font-light">
-                        {stage.successLooksLike}
-                      </p>
-                    </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: '#9C8B5E' }} />
+                    <span className="text-sm text-gray-600">
+                      {stages[activeStage - 1].youGet.length} deliverables
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Right Side */}
+            <div className="space-y-8">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
+                  <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
+                  We Do
+                </h4>
+                <div className="space-y-3">
+                  {stages[activeStage - 1].weDo.map((item, itemIndex) => (
+                    <p key={itemIndex} className="text-gray-600 leading-relaxed font-light">
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
+                  <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
+                  You Get
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {stages[activeStage - 1].youGet.map((item, itemIndex) => (
+                    <span
+                      key={itemIndex}
+                      className="px-3 py-1 text-sm rounded-full font-medium"
+                      style={{
+                        backgroundColor: '#9C8B5E20',
+                        color: '#9C8B5E'
+                      }}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
+                  <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
+                  Success Looks Like
+                </h4>
+                <p className="text-gray-600 leading-relaxed font-light">
+                  {stages[activeStage - 1].successLooksLike}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Arrows */}
+        <div className="flex justify-center mt-12 space-x-4">
+          <button
+            onClick={() => setActiveStage(Math.max(1, activeStage - 1))}
+            disabled={activeStage === 1}
+            className={`
+              px-6 py-3 rounded-full font-medium transition-all duration-300
+              ${activeStage === 1 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }
+            `}
+          >
+            ← Previous
+          </button>
+          <button
+            onClick={() => setActiveStage(Math.min(5, activeStage + 1))}
+            disabled={activeStage === 5}
+            className={`
+              px-6 py-3 rounded-full font-medium transition-all duration-300
+              ${activeStage === 5 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }
+            `}
+          >
+            Next →
+          </button>
         </div>
 
         {/* Stage Indicators */}
