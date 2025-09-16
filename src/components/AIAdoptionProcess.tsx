@@ -65,6 +65,7 @@ const stages: Stage[] = [
 
 export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
+  const [isHorizontalMode, setIsHorizontalMode] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isScrollingRef = useRef<boolean>(false);
@@ -110,10 +111,12 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const rect = section.getBoundingClientRect();
     
-    // Only activate when section is clearly in view
-    const isInSection = rect.top < 200 && rect.bottom > 200;
+    // Check if we're in the section
+    const isInSection = rect.top < 100 && rect.bottom > 100;
     
-    if (isInSection) {
+    if (isInSection && !isHorizontalMode) {
+      // Enter horizontal mode
+      setIsHorizontalMode(true);
       e.preventDefault();
       e.stopPropagation();
       
@@ -143,8 +146,19 @@ export default function AIAdoptionProcess() {
       setTimeout(() => {
         isScrollingRef.current = false;
       }, 500);
+    } else if (!isInSection && isHorizontalMode) {
+      // Exit horizontal mode
+      setIsHorizontalMode(false);
     }
-  }, []);
+  }, [isHorizontalMode]);
+
+  const handleGlobalWheel = useCallback((e: WheelEvent) => {
+    // If we're in horizontal mode, prevent all vertical scrolling
+    if (isHorizontalMode) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, [isHorizontalMode]);
 
   useEffect(() => {
     const content = contentRef.current;
@@ -152,12 +166,14 @@ export default function AIAdoptionProcess() {
 
     content.addEventListener('scroll', handleScroll);
     window.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('wheel', handleGlobalWheel, { passive: false });
     
     return () => {
       content.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('wheel', handleGlobalWheel);
     };
-  }, [handleScroll, handleWheel]);
+  }, [handleScroll, handleWheel, handleGlobalWheel]);
 
   return (
     <section className="py-24 bg-white relative" id="ai-adoption-process" ref={sectionRef}>
