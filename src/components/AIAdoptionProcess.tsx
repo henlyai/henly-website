@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Stage {
   id: number;
@@ -67,76 +67,60 @@ export default function AIAdoptionProcess() {
   const [activeStage, setActiveStage] = useState<number>(1);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const rafId = useRef<number | null>(null);
-  const lastScrollY = useRef(0);
 
-  // Throttled scroll handler using requestAnimationFrame
-  const handleScroll = useCallback(() => {
-    if (rafId.current) return;
-    
-    rafId.current = requestAnimationFrame(() => {
-      if (!sectionRef.current || !contentRef.current) {
-        rafId.current = null;
-        return;
-      }
+  useEffect(() => {
+    let ticking = false;
+
+    const updateScroll = () => {
+      if (!sectionRef.current || !contentRef.current) return;
 
       const section = sectionRef.current;
-      const content = contentRef.current;
       const sectionTop = section.offsetTop;
       const sectionHeight = section.offsetHeight;
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Calculate horizontal scroll zone
-      const horizontalScrollStart = sectionTop - windowHeight;
-      const horizontalScrollEnd = sectionTop + sectionHeight - windowHeight;
+      // Calculate when section is in view
+      const sectionStart = sectionTop - windowHeight;
+      const sectionEnd = sectionTop + sectionHeight - windowHeight;
       
-      // Check if we're in the horizontal scroll zone
-      const isInZone = scrollY >= horizontalScrollStart && scrollY <= horizontalScrollEnd;
-      
-      if (isInZone) {
-        // Calculate horizontal scroll progress
-        const scrollProgress = (scrollY - horizontalScrollStart) / (horizontalScrollEnd - horizontalScrollStart);
-        const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
+      if (scrollY >= sectionStart && scrollY <= sectionEnd) {
+        // Calculate progress through the section
+        const progress = (scrollY - sectionStart) / (sectionEnd - sectionStart);
+        const clampedProgress = Math.max(0, Math.min(1, progress));
         
-        // Calculate which stage should be active
+        // Update active stage
         const stageIndex = Math.floor(clampedProgress * stages.length);
         const newActiveStage = Math.min(stageIndex + 1, stages.length);
+        setActiveStage(newActiveStage);
         
-        if (newActiveStage !== activeStage) {
-          setActiveStage(newActiveStage);
-        }
+        // Update horizontal scroll position
+        const maxScroll = contentRef.current.scrollWidth - contentRef.current.clientWidth;
+        const targetScroll = clampedProgress * maxScroll;
         
-        // Scroll content horizontally smoothly
-        const maxScrollLeft = content.scrollWidth - content.clientWidth;
-        const targetScrollLeft = clampedProgress * maxScrollLeft;
-        
-        // Use smooth scrolling instead of direct assignment
-        content.scrollTo({
-          left: targetScrollLeft,
-          behavior: 'smooth'
+        // Use requestAnimationFrame for smooth updates
+        requestAnimationFrame(() => {
+          if (contentRef.current) {
+            contentRef.current.scrollLeft = targetScroll;
+          }
         });
       }
       
-      lastScrollY.current = scrollY;
-      rafId.current = null;
-    });
-  }, [activeStage]);
+      ticking = false;
+    };
 
-  useEffect(() => {
-    // Use passive: true for better performance
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Initial call
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId.current) {
-        cancelAnimationFrame(rafId.current);
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(updateScroll);
+        ticking = true;
       }
     };
-  }, [handleScroll]);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    updateScroll(); // Initial call
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scrollToStage = (stageId: number) => {
     if (!sectionRef.current) return;
@@ -144,17 +128,20 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
     const windowHeight = window.innerHeight;
-    const horizontalScrollStart = sectionTop - windowHeight;
-    const horizontalScrollEnd = sectionTop + section.offsetHeight - windowHeight;
+    const sectionStart = sectionTop - windowHeight;
+    const sectionEnd = sectionTop + section.offsetHeight - windowHeight;
     
-    // Calculate target scroll position
     const progress = (stageId - 1) / (stages.length - 1);
-    const targetScrollY = horizontalScrollStart + (progress * (horizontalScrollEnd - horizontalScrollStart));
+    const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
     
-    window.scrollTo({
-      top: targetScrollY,
-      behavior: 'smooth'
-    });
+    // Temporarily disable smooth scrolling for this action
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, targetScrollY);
+    
+    // Re-enable smooth scrolling after a short delay
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = 'smooth';
+    }, 100);
   };
 
   return (
@@ -178,9 +165,9 @@ export default function AIAdoptionProcess() {
             </p>
           </div>
 
-          {/* Fixed Timeline */}
+          {/* Timeline */}
           <div className="mb-16">
-            {/* Progress Indicator */}
+            {/* Progress */}
             <div className="flex justify-center mb-8">
               <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
                 <span className="text-sm font-medium text-gray-600">
@@ -188,7 +175,7 @@ export default function AIAdoptionProcess() {
                 </span>
                 <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    className="h-full rounded-full transition-all duration-300"
                     style={{ 
                       width: `${(activeStage / 5) * 100}%`,
                       backgroundColor: '#595F39'
@@ -205,11 +192,11 @@ export default function AIAdoptionProcess() {
                   <button
                     key={stage.id}
                     onClick={() => scrollToStage(stage.id)}
-                    className="flex flex-col items-center group cursor-pointer transition-all duration-300"
+                    className="flex flex-col items-center group cursor-pointer"
                   >
                     <div
                       className={`
-                        w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-500 ease-out
+                        w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300
                         ${activeStage === stage.id ? 'scale-110 shadow-lg' : 'hover:scale-105'}
                       `}
                       style={{
@@ -220,13 +207,13 @@ export default function AIAdoptionProcess() {
                       {stage.id}
                     </div>
                     <span className={`
-                      mt-3 text-sm font-medium transition-colors duration-500 ease-out
+                      mt-3 text-sm font-medium transition-colors duration-300
                       ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
                     `}>
                       {stage.label}
                     </span>
                     <span 
-                      className="px-2 py-1 text-xs font-medium rounded-full mt-1 transition-all duration-500 ease-out"
+                      className="px-2 py-1 text-xs font-medium rounded-full mt-1"
                       style={{
                         backgroundColor: activeStage === stage.id ? '#595F39' : '#9C8B5E',
                         color: 'white',
@@ -241,7 +228,7 @@ export default function AIAdoptionProcess() {
             </div>
           </div>
 
-          {/* Horizontal Scrolling Content */}
+          {/* Content */}
           <div className="relative">
             <div 
               ref={contentRef}
@@ -249,7 +236,7 @@ export default function AIAdoptionProcess() {
               style={{ 
                 scrollbarWidth: 'none', 
                 msOverflowStyle: 'none',
-                scrollBehavior: 'smooth'
+                scrollBehavior: 'auto' // Override global smooth scrolling
               }}
             >
               {stages.map((stage) => (
@@ -259,7 +246,7 @@ export default function AIAdoptionProcess() {
                 >
                   <div className="max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
-                      {/* Left Side - Stage Overview */}
+                      {/* Left Side */}
                       <div className="space-y-8">
                         <div>
                           <h3 className="text-3xl font-medium text-gray-900 mb-4">
@@ -270,7 +257,6 @@ export default function AIAdoptionProcess() {
                           </p>
                         </div>
 
-                        {/* Quick Stats */}
                         <div className="bg-gray-50 rounded-2xl p-6">
                           <div className="flex items-center justify-between mb-4">
                             <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
@@ -303,9 +289,8 @@ export default function AIAdoptionProcess() {
                         </div>
                       </div>
 
-                      {/* Right Side - Detailed Content */}
+                      {/* Right Side */}
                       <div className="space-y-8">
-                        {/* We Do */}
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                             <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
@@ -320,7 +305,6 @@ export default function AIAdoptionProcess() {
                           </div>
                         </div>
 
-                        {/* You Get */}
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                             <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
@@ -342,7 +326,6 @@ export default function AIAdoptionProcess() {
                           </div>
                         </div>
 
-                        {/* Success Looks Like */}
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                             <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
@@ -366,7 +349,7 @@ export default function AIAdoptionProcess() {
                   key={stage.id}
                   onClick={() => scrollToStage(stage.id)}
                   className={`
-                    w-3 h-3 rounded-full transition-all duration-500 ease-out
+                    w-3 h-3 rounded-full transition-all duration-300
                     ${activeStage === stage.id ? 'scale-125' : 'hover:scale-110'}
                   `}
                   style={{
@@ -379,7 +362,7 @@ export default function AIAdoptionProcess() {
         </div>
       </div>
 
-      {/* Bottom CTA - Positioned after the section ends */}
+      {/* CTA */}
       <div className="absolute bottom-0 left-0 right-0 bg-white py-16 px-6 border-t border-gray-100">
         <div className="text-center">
           <p className="text-lg text-gray-600 mb-6 font-light">
