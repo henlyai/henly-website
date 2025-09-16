@@ -80,9 +80,10 @@ export default function AIAdoptionProcess() {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Much more conservative timing - start when section is almost at top, end when almost at bottom
-      const sectionStart = sectionTop - (windowHeight * 0.8); // Start when section is 80% from top
-      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.8); // End when section is 80% from bottom
+      // Start horizontal scroll only when section reaches the bottom (when section top reaches viewport bottom)
+      // End when section is almost at the very bottom
+      const sectionStart = sectionTop - windowHeight; // Start when section top reaches bottom of viewport
+      const sectionEnd = sectionTop + sectionHeight - (windowHeight * 0.1); // End when section is 10% from bottom
       
       if (scrollY >= sectionStart && scrollY <= sectionEnd) {
         // Calculate progress through the section
@@ -128,8 +129,8 @@ export default function AIAdoptionProcess() {
     const section = sectionRef.current;
     const sectionTop = section.offsetTop;
     const windowHeight = window.innerHeight;
-    const sectionStart = sectionTop - (windowHeight * 0.8);
-    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.8);
+    const sectionStart = sectionTop - windowHeight;
+    const sectionEnd = sectionTop + section.offsetHeight - (windowHeight * 0.1);
     
     const progress = (stageId - 1) / (stages.length - 1);
     const targetScrollY = sectionStart + (progress * (sectionEnd - sectionStart));
@@ -149,7 +150,7 @@ export default function AIAdoptionProcess() {
       ref={sectionRef}
       className="py-24 bg-white relative"
       id="ai-adoption-process"
-      style={{ height: `${stages.length * 150}vh` }} // Increased to 150vh for even more space
+      style={{ height: `${stages.length * 150}vh` }}
     >
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center">
