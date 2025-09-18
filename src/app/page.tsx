@@ -105,13 +105,13 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center">
+            <div className="flex items-center px-2">
               <Image
                 src="/henly_ai_logo.png"
                 alt="Henly AI"
                 width={200}
                 height={45}
-                className="h-12 w-auto"
+                className="h-9 w-auto"
                 priority
               />
             </div>
