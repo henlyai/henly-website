@@ -347,17 +347,6 @@ class N8nEmailService implements IEmailService {
         body: JSON.stringify({
           type: 'invitation',
           to: params.to,
-          subject: EMAIL_TEMPLATES.invitation.subject.replace('{{organizationName}}', params.organizationName),
-          html: EMAIL_TEMPLATES.invitation.html
-            .replace(/{{organizationName}}/g, params.organizationName)
-            .replace(/{{inviterName}}/g, params.inviterName)
-            .replace(/{{inviteUrl}}/g, params.inviteUrl)
-            .replace(/{{expiresAt}}/g, params.expiresAt),
-          text: EMAIL_TEMPLATES.invitation.text
-            .replace(/{{organizationName}}/g, params.organizationName)
-            .replace(/{{inviterName}}/g, params.inviterName)
-            .replace(/{{inviteUrl}}/g, params.inviteUrl)
-            .replace(/{{expiresAt}}/g, params.expiresAt),
           metadata: {
             organizationName: params.organizationName,
             inviterName: params.inviterName,
@@ -400,13 +389,6 @@ class N8nEmailService implements IEmailService {
         body: JSON.stringify({
           type: 'welcome',
           to: params.to,
-          subject: EMAIL_TEMPLATES.welcome.subject.replace('{{organizationName}}', params.organizationName),
-          html: EMAIL_TEMPLATES.welcome.html
-            .replace(/{{organizationName}}/g, params.organizationName)
-            .replace(/{{dashboardUrl}}/g, params.dashboardUrl),
-          text: EMAIL_TEMPLATES.welcome.text
-            .replace(/{{organizationName}}/g, params.organizationName)
-            .replace(/{{dashboardUrl}}/g, params.dashboardUrl),
           metadata: {
             organizationName: params.organizationName,
             dashboardUrl: params.dashboardUrl,
@@ -448,17 +430,6 @@ class N8nEmailService implements IEmailService {
         body: JSON.stringify({
           type: 'verification',
           to: params.to,
-          subject: EMAIL_TEMPLATES.verification.subject.replace('{{organizationName}}', params.organizationName),
-          html: EMAIL_TEMPLATES.verification.html
-            .replace(/{{organizationName}}/g, params.organizationName)
-            .replace(/{{fullName}}/g, params.fullName)
-            .replace(/{{verificationUrl}}/g, params.verificationUrl)
-            .replace(/{{email}}/g, params.to),
-          text: EMAIL_TEMPLATES.verification.text
-            .replace(/{{organizationName}}/g, params.organizationName)
-            .replace(/{{fullName}}/g, params.fullName)
-            .replace(/{{verificationUrl}}/g, params.verificationUrl)
-            .replace(/{{email}}/g, params.to),
           metadata: {
             organizationName: params.organizationName,
             fullName: params.fullName,

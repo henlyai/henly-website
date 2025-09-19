@@ -1,0 +1,154 @@
+{
+  "name": "Dashboard Email Sending - Henly",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/send-email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        32
+      ],
+      "id": "b30d00d6-0252-4a96-9f44-918a01bfa496",
+      "name": "Webhook",
+      "webhookId": "f7fd6f67-dba0-49e2-ba0b-453a90388c72"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawInput = $input.first();\nlet webhookData;\n\nif (rawInput.json && rawInput.json.body) {\n  webhookData = rawInput.json.body;\n} else if (rawInput.body) {\n  webhookData = rawInput.body;\n} else if (rawInput.json) {\n  webhookData = rawInput.json;\n} else {\n  webhookData = rawInput;\n}\n\nconsole.log('Webhook data received:', webhookData);\n\n// Validate required fields\nif (!webhookData.type || !webhookData.to) {\n  throw new Error('Missing required fields: type and to');\n}\n\n// Process email based on type\nlet processedEmail;\n\nswitch (webhookData.type) {\n  case 'invitation':\n    processedEmail = {\n      to: webhookData.to,\n      from: 'seb@henly.ai',\n      subject: `You're invited to join ${webhookData.metadata?.organizationName || 'our organization'} on Henly AI`,\n      html: `\n        <!DOCTYPE html>\n        <html>\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <title>Invitation to Henly AI</title>\n        </head>\n        <body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;\">\n          <div style=\"text-align: center; margin-bottom: 30px;\">\n            <h1 style=\"color: #595F39; margin-bottom: 10px;\">🎉 You're Invited!</h1>\n            <p style=\"font-size: 18px; color: #666;\">Join ${webhookData.metadata?.organizationName || 'our organization'} on Henly AI</p>\n          </div>\n          \n          <div style=\"background: #f8fafc; padding: 25px; border-radius: 10px; margin-bottom: 25px;\">\n            <p style=\"margin-bottom: 15px;\">\n              <strong>${webhookData.metadata?.inviterName || 'A team member'}</strong> has invited you to join \n              <strong>${webhookData.metadata?.organizationName || 'our organization'}</strong> on Henly AI.\n            </p>\n            \n            <p style=\"margin-bottom: 20px;\">\n              Henly AI is a powerful platform for AI-powered chatbots and automation tools.\n            </p>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n              <a href=\"${webhookData.metadata?.inviteUrl || '#'}\" \n                 style=\"background: #595F39; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">\n                Accept Invitation\n              </a>\n            </div>\n            \n            <p style=\"font-size: 14px; color: #666; text-align: center;\">\n              This invitation expires on ${webhookData.metadata?.expiresAt || 'December 31, 2024'}\n            </p>\n          </div>\n          \n          <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;\">\n            <p style=\"color: #666; font-size: 14px;\">\n              Questions? Contact us at <a href=\"mailto:seb@henly.ai\" style=\"color: #595F39;\">seb@henly.ai</a>\n            </p>\n          </div>\n        </body>\n        </html>\n      `,\n      text: `\nYou're Invited to Henly AI!\n\n${webhookData.metadata?.inviterName || 'A team member'} has invited you to join ${webhookData.metadata?.organizationName || 'our organization'} on Henly AI.\n\nHenly AI is a powerful platform for AI-powered chatbots and automation tools.\n\nAccept your invitation: ${webhookData.metadata?.inviteUrl || '#'}\n\nThis invitation expires on ${webhookData.metadata?.expiresAt || 'December 31, 2024'}.\n\nQuestions? Contact us at seb@henly.ai\n      `\n    };\n    break;\n    \n  case 'verification':\n    processedEmail = {\n      to: webhookData.to,\n      from: 'seb@henly.ai',\n      subject: 'Verify your email address - Henly AI',\n      html: `\n        <!DOCTYPE html>\n        <html>\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <title>Verify Your Email - Henly AI</title>\n        </head>\n        <body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;\">\n          <div style=\"text-align: center; margin-bottom: 30px;\">\n            <h1 style=\"color: #595F39; margin-bottom: 10px;\">🔐 Verify Your Email</h1>\n            <p style=\"font-size: 18px; color: #666;\">Complete your Henly AI account setup</p>\n          </div>\n          \n          <div style=\"background: #f8fafc; padding: 25px; border-radius: 10px; margin-bottom: 25px;\">\n            <p style=\"margin-bottom: 15px;\">\n              Hi <strong>${webhookData.metadata?.fullName || 'there'}</strong>, welcome to <strong>${webhookData.metadata?.organizationName || 'Henly AI'}</strong>! \n              To complete your account setup, please verify your email address.\n            </p>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n              <a href=\"${webhookData.metadata?.verificationUrl || '#'}\" \n                 style=\"background: #595F39; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">\n                Verify Email Address\n              </a>\n            </div>\n            \n            <p style=\"font-size: 14px; color: #666; text-align: center;\">\n              This verification link expires in 24 hours\n            </p>\n          </div>\n          \n          <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;\">\n            <p style=\"color: #666; font-size: 14px;\">\n              Questions? Contact us at <a href=\"mailto:seb@henly.ai\" style=\"color: #595F39;\">seb@henly.ai</a>\n            </p>\n          </div>\n        </body>\n        </html>\n      `,\n      text: `\nVerify Your Email - Henly AI\n\nHi ${webhookData.metadata?.fullName || 'there'}, welcome to ${webhookData.metadata?.organizationName || 'Henly AI'}!\n\nTo complete your account setup, please verify your email address.\n\nVerify your email: ${webhookData.metadata?.verificationUrl || '#'}\n\nThis verification link expires in 24 hours.\n\nQuestions? Contact us at seb@henly.ai\n      `\n    };\n    break;\n    \n  case 'welcome':\n    processedEmail = {\n      to: webhookData.to,\n      from: 'seb@henly.ai',\n      subject: `Welcome to ${webhookData.metadata?.organizationName || 'Henly AI'}! 🎉`,\n      html: `\n        <!DOCTYPE html>\n        <html>\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <title>Welcome to Henly AI</title>\n        </head>\n        <body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;\">\n          <div style=\"text-align: center; margin-bottom: 30px;\">\n            <h1 style=\"color: #595F39; margin-bottom: 10px;\">🎉 Welcome to Henly AI!</h1>\n            <p style=\"font-size: 18px; color: #666;\">Your account is ready to go</p>\n          </div>\n          \n          <div style=\"background: #f8fafc; padding: 25px; border-radius: 10px; margin-bottom: 25px;\">\n            <p style=\"margin-bottom: 15px;\">\n              Hi <strong>${webhookData.metadata?.userName || 'there'}</strong>! Welcome to \n              <strong>${webhookData.metadata?.organizationName || 'Henly AI'}</strong>.\n            </p>\n            \n            <p style=\"margin-bottom: 20px;\">\n              Your account has been successfully created and you're ready to start using our AI-powered platform.\n            </p>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n              <a href=\"${webhookData.metadata?.dashboardUrl || 'https://henly.ai/dashboard'}\" \n                 style=\"background: #595F39; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">\n                Go to Dashboard\n              </a>\n            </div>\n          </div>\n          \n          <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;\">\n            <p style=\"color: #666; font-size: 14px;\">\n              Questions? Contact us at <a href=\"mailto:seb@henly.ai\" style=\"color: #595F39;\">seb@henly.ai</a>\n            </p>\n          </div>\n        </body>\n        </html>\n      `,\n      text: `\nWelcome to Henly AI!\n\nHi ${webhookData.metadata?.userName || 'there'}! Welcome to ${webhookData.metadata?.organizationName || 'Henly AI'}.\n\nYour account has been successfully created and you're ready to start using our AI-powered platform.\n\nGo to Dashboard: ${webhookData.metadata?.dashboardUrl || 'https://henly.ai/dashboard'}\n\nQuestions? Contact us at seb@henly.ai\n      `\n    };\n    break;\n    \n  case 'password_reset':\n    processedEmail = {\n      to: webhookData.to,\n      from: 'seb@henly.ai',\n      subject: 'Reset your password - Henly AI',\n      html: `\n        <!DOCTYPE html>\n        <html>\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <title>Reset Password - Henly AI</title>\n        </head>\n        <body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;\">\n          <div style=\"text-align: center; margin-bottom: 30px;\">\n            <h1 style=\"color: #dc2626; margin-bottom: 10px;\">🔑 Reset Your Password</h1>\n            <p style=\"font-size: 18px; color: #666;\">Secure your Henly AI account</p>\n          </div>\n          \n          <div style=\"background: #f8fafc; padding: 25px; border-radius: 10px; margin-bottom: 25px;\">\n            <p style=\"margin-bottom: 15px;\">\n              We received a request to reset your password for your <strong>Henly AI</strong> account.\n            </p>\n            \n            <p style=\"margin-bottom: 20px;\">\n              If you didn't request this, you can safely ignore this email.\n            </p>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n              <a href=\"${webhookData.metadata?.resetUrl || '#'}\" \n                 style=\"background: #dc2626; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">\n                Reset Password\n              </a>\n            </div>\n            \n            <p style=\"font-size: 14px; color: #666; text-align: center;\">\n              This reset link expires in 1 hour\n            </p>\n          </div>\n          \n          <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;\">\n            <p style=\"color: #666; font-size: 14px;\">\n              Questions? Contact us at <a href=\"mailto:seb@henly.ai\" style=\"color: #595F39;\">seb@henly.ai</a>\n            </p>\n          </div>\n        </body>\n        </html>\n      `,\n      text: `\nReset Your Password - Henly AI\n\nWe received a request to reset your password for your Henly AI account.\n\nIf you didn't request this, you can safely ignore this email.\n\nReset your password: ${webhookData.metadata?.resetUrl || '#'}\n\nThis reset link expires in 1 hour.\n\nQuestions? Contact us at seb@henly.ai\n      `\n    };\n    break;\n    \n  case 'organization_created':\n    processedEmail = {\n      to: webhookData.to,\n      from: 'seb@henly.ai',\n      subject: `Welcome to ${webhookData.metadata?.organizationName || 'Henly AI'}! 🚀`,\n      html: `\n        <!DOCTYPE html>\n        <html>\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <title>Organization Created - Henly AI</title>\n        </head>\n        <body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;\">\n          <div style=\"text-align: center; margin-bottom: 30px;\">\n            <h1 style=\"color: #595F39; margin-bottom: 10px;\">🚀 Organization Created!</h1>\n            <p style=\"font-size: 18px; color: #666;\">Welcome to Henly AI</p>\n          </div>\n          \n          <div style=\"background: #f8fafc; padding: 25px; border-radius: 10px; margin-bottom: 25px;\">\n            <p style=\"margin-bottom: 15px;\">\n              Congratulations! Your organization <strong>${webhookData.metadata?.organizationName || 'Organization'}</strong> has been successfully created on Henly AI.\n            </p>\n            \n            <p style=\"margin-bottom: 20px;\">\n              As the admin, you can now invite team members and start building your AI-powered solutions.\n            </p>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n              <a href=\"${webhookData.metadata?.dashboardUrl || 'https://henly.ai/dashboard'}\" \n                 style=\"background: #595F39; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">\n                Go to Dashboard\n              </a>\n            </div>\n          </div>\n          \n          <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;\">\n            <p style=\"color: #666; font-size: 14px;\">\n              Questions? Contact us at <a href=\"mailto:seb@henly.ai\" style=\"color: #595F39;\">seb@henly.ai</a>\n            </p>\n          </div>\n        </body>\n        </html>\n      `,\n      text: `\nOrganization Created - Henly AI\n\nCongratulations! Your organization ${webhookData.metadata?.organizationName || 'Organization'} has been successfully created on Henly AI.\n\nAs the admin, you can now invite team members and start building your AI-powered solutions.\n\nGo to Dashboard: ${webhookData.metadata?.dashboardUrl || 'https://henly.ai/dashboard'}\n\nQuestions? Contact us at seb@henly.ai\n      `\n    };\n    break;\n    \n  default:\n    throw new Error(`Unsupported email type: ${webhookData.type}`);\n}\n\nconsole.log('Processed email:', processedEmail);\nreturn processedEmail;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        32
+      ],
+      "id": "53d08f4a-e195-4e07-9b22-4e879f59b418",
+      "name": "Process Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simple success logging\nconst successData = {\n  status: 'success',\n  timestamp: new Date().toISOString(),\n  message: 'Email sent successfully',\n  emailType: $input.first().type,\n  recipient: $input.first().to,\n  subject: $input.first().subject\n};\n\nconsole.log('✅ Email workflow success:', successData);\nreturn successData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        32
+      ],
+      "id": "f012ceaf-30a4-442e-90c8-fabbd73023cc",
+      "name": "Success Log"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        32
+      ],
+      "id": "aec03b56-efbd-483e-9890-8d66b9f3e96d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fromEmail": "seb@henly.ai",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        32
+      ],
+      "id": "bffca312-efcc-43cb-aaae-bf2c575f2243",
+      "name": "Send email",
+      "webhookId": "98353789-460d-4ed0-8b8c-ead170a05858",
+      "credentials": {
+        "smtp": {
+          "id": "y7OgoKnYk7rXEwuF",
+          "name": "Seb SMTP"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Log": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Data": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Success Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "902fe6ee-06e4-4dbb-88bc-69febaa717c6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b290958628946814704a7f34e4bcb09ce7f800f716bf502fc7e428d445869d39"
+  },
+  "id": "DO8dkgb2VDmwoTTw",
+  "tags": [
+    {
+      "createdAt": "2025-07-11T07:57:36.741Z",
+      "updatedAt": "2025-07-11T07:57:36.741Z",
+      "id": "CNcGzeIdZF2vZauU",
+      "name": "Done"
+    }
+  ]
+}
