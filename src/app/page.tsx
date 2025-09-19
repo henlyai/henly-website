@@ -409,7 +409,7 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
           <div className="grid md:grid-cols-4 gap-16">
             <div className="col-span-2">
               <div className="flex items-center mb-8">
-                <Image src="/henly_logo.png" alt="Henly AI Logo" width={48} height={48} className="h-12 w-12" />
+                <Image src="/henly_ai_icon.png" alt="Henly AI Logo" width={48} height={48} className="h-12 w-12" />
                 <span className="ml-4 text-3xl font-light">Henly AI</span>
               </div>
               <p className="text-gray-300 mb-8 leading-relaxed font-light text-lg">
