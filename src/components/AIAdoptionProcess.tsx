@@ -76,7 +76,7 @@ export default function AIAdoptionProcess() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
-            Our 5-Stage AI Adoption <span style={{ color: '#595F39' }}>Process</span>
+            The Henly rollout: A 5-stage plan that works
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
             Transform your business with AI before your competitors do. Our proven methodology delivers measurable results, 
@@ -125,7 +125,7 @@ export default function AIAdoptionProcess() {
                   >
                     {stage.id}
                   </div>
-                  <span className={`
+                                    <span className={`
                     mt-3 text-sm font-medium transition-colors duration-300
                     ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
                   `}>

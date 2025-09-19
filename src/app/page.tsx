@@ -157,9 +157,9 @@ export default function Home() {
             className="mb-24"
           >
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light mb-8 leading-[1.1] tracking-tight pb-4">
-              <span className="block text-gray-900 mb-3 font-extralight">Make AI</span>
+              <span className="block text-gray-900 mb-3 font-extralight">Stop "exploring" AI.</span>
               <span className="block font-normal bg-gradient-to-r from-[#595F39] via-[#7A8B5A] to-[#9C8B5E] bg-clip-text text-transparent">
-                work for you
+                Start using it.
               </span>
             </h1>
             
@@ -169,7 +169,8 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto leading-relaxed font-light mb-10"
             >
-              All-in-one secure AI platform, uniting your systems, knowledge, and people.
+              Analyze → Pilot → Deploy.
+Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             </motion.p>
 
             {/* Enhanced CTA Buttons */}
