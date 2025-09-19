@@ -36,8 +36,12 @@ export async function POST(request: NextRequest) {
         full_name: fullName,
         role: role,
         is_active: true,
-        is_verified: true,
-        email_verification_required: false,
+        status: 'pending',
+        onboarding_step: 'email_verification',
+        profile_completion_percentage: 80,
+        invitation_status: 'none',
+        is_verified: false,
+        email_verification_required: true,
         organization_id: null // Will be set when user creates/joins an organization
       } as any)
       .select()

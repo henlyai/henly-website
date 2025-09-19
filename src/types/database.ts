@@ -60,6 +60,21 @@ export interface Database {
           last_login: string | null
           created_at: string
           updated_at: string
+          linkedin_url: string | null
+          status: 'pending' | 'active' | 'suspended' | 'invited'
+          onboarding_step: string
+          profile_completion_percentage: number
+          invitation_accepted_at: string | null
+          last_activity_at: string
+          invitation_token: string | null
+          invitation_expires_at: string | null
+          invited_by: string | null
+          invitation_status: 'none' | 'pending' | 'accepted' | 'expired'
+          email_verified_at: string | null
+          email_verification_token: string | null
+          email_verification_expires_at: string | null
+          is_verified: boolean
+          email_verification_required: boolean
         }
         Insert: {
           id: string
@@ -72,6 +87,21 @@ export interface Database {
           last_login?: string | null
           created_at?: string
           updated_at?: string
+          linkedin_url?: string | null
+          status?: 'pending' | 'active' | 'suspended' | 'invited'
+          onboarding_step?: string
+          profile_completion_percentage?: number
+          invitation_accepted_at?: string | null
+          last_activity_at?: string
+          invitation_token?: string | null
+          invitation_expires_at?: string | null
+          invited_by?: string | null
+          invitation_status?: 'none' | 'pending' | 'accepted' | 'expired'
+          email_verified_at?: string | null
+          email_verification_token?: string | null
+          email_verification_expires_at?: string | null
+          is_verified?: boolean
+          email_verification_required?: boolean
         }
         Update: {
           id?: string
@@ -84,6 +114,21 @@ export interface Database {
           last_login?: string | null
           created_at?: string
           updated_at?: string
+          linkedin_url?: string | null
+          status?: 'pending' | 'active' | 'suspended' | 'invited'
+          onboarding_step?: string
+          profile_completion_percentage?: number
+          invitation_accepted_at?: string | null
+          last_activity_at?: string
+          invitation_token?: string | null
+          invitation_expires_at?: string | null
+          invited_by?: string | null
+          invitation_status?: 'none' | 'pending' | 'accepted' | 'expired'
+          email_verified_at?: string | null
+          email_verification_token?: string | null
+          email_verification_expires_at?: string | null
+          is_verified?: boolean
+          email_verification_required?: boolean
         }
       }
       chat_sessions: {

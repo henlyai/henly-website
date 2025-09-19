@@ -68,8 +68,13 @@ export async function POST(request: NextRequest) {
       email,
       organization_id: orgData.id,
       role: 'admin',
-      is_verified: process.env.NODE_ENV === 'production' ? false : true, // Require verification in production
-      email_verification_required: process.env.NODE_ENV === 'production' ? true : false // Require verification in production
+      is_active: true,
+      status: 'pending',
+      onboarding_step: 'email_verification',
+      profile_completion_percentage: 80,
+      invitation_status: 'none',
+      is_verified: false,
+      email_verification_required: true
     }
     
     console.log('Attempting to create profile with data:', profileData)
@@ -101,7 +106,7 @@ export async function POST(request: NextRequest) {
     
     // Send verification email if in production or if email verification is required
     let emailSent = false
-    if (process.env.NODE_ENV === 'production' || profileData.email_verification_required) {
+    if (process.env.NODE_ENV === 'production') {
       try {
         const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/verify-email?token=${userId}&email=${encodeURIComponent(email)}`
         
