@@ -84,7 +84,13 @@ export async function POST(request: NextRequest) {
               full_name: authUser.user.user_metadata?.full_name || 'User',
               organization_id: null,
               role: 'admin',
-              is_verified: false
+              is_active: true,
+              status: 'pending',
+              onboarding_step: 'email_verification',
+              profile_completion_percentage: 80,
+              invitation_status: 'none',
+              is_verified: false,
+              email_verification_required: true
             })
             .select()
             .single()
@@ -122,14 +128,20 @@ export async function POST(request: NextRequest) {
       .from('profiles')
       .update({ 
         is_verified: true,
-        email_verified_at: new Date().toISOString()
+        email_verified_at: new Date().toISOString(),
+        status: 'active',
+        onboarding_step: 'completed',
+        profile_completion_percentage: 100,
+        last_login: new Date().toISOString(),
+        last_activity_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       })
       .eq('id', profileData.id)
 
     if (updateError) {
-      console.error('Error updating verification status:', updateError)
+      console.error('Error updating profile:', updateError)
       return NextResponse.json(
-        { error: 'Failed to update verification status' },
+        { error: 'Failed to update profile' },
         { status: 500 }
       )
     }

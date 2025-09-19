@@ -132,15 +132,15 @@ export async function POST(request: NextRequest) {
       email,
       organization_id: organizationId,
       role: invitationData.role, // Use the role from the invitation
-      is_verified: false, // Require email verification
-      email_verification_required: true, // Require verification for invited users
       is_active: true,
-      status: 'pending_verification',
+      status: 'invited', // Use valid status from constraint
       onboarding_step: 'email_verification',
       profile_completion_percentage: 80,
       invitation_accepted_at: new Date().toISOString(),
       last_activity_at: new Date().toISOString(),
       invitation_status: 'accepted',
+      is_verified: false,
+      email_verification_required: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
     let emailError: string | null = null
 
     try {
-      const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${userData.user.email_confirmation_token}&type=signup`
+      const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${userId}&email=${encodeURIComponent(email)}`
       
       const emailResult = await sendVerificationEmail({
         to: email,
