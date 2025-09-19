@@ -79,33 +79,14 @@ export default function AIAdoptionProcess() {
             The Henly rollout: A 5-stage plan that works
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
-            Transform your business with AI before your competitors do. Our proven methodology delivers measurable results, 
-            competitive advantage, and future-ready operations that scale with your growth.
+            A clear path from idea to impact. Measurable outcomes at each stage.
           </p>
         </div>
 
         {/* Timeline Navigation */}
         <div className="mb-16">
-          {/* Progress */}
-          <div className="flex justify-center mb-8">
-            <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
-              <span className="text-sm font-medium text-gray-600">
-                Stage {activeStage} of 5
-              </span>
-              <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${(activeStage / 5) * 100}%`,
-                    backgroundColor: '#595F39'
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Timeline Nodes */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-8">
             <div className="flex items-center space-x-8">
               {stages.map((stage) => (
                 <button
@@ -125,24 +106,32 @@ export default function AIAdoptionProcess() {
                   >
                     {stage.id}
                   </div>
-                                    <span className={`
+                  <span className={`
                     mt-3 text-sm font-medium transition-colors duration-300
                     ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
                   `}>
                     {stage.label}
                   </span>
-                  <span 
-                    className="px-2 py-1 text-xs font-medium rounded-full mt-1"
-                    style={{
-                      backgroundColor: activeStage === stage.id ? '#595F39' : '#9C8B5E',
-                      color: 'white',
-                      opacity: activeStage === stage.id ? 1 : 0.8
-                    }}
-                  >
-                    {stage.timeline}
-                  </span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Progress Bar - Now below the stage numbers */}
+          <div className="flex justify-center">
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
+              <span className="text-sm font-medium text-gray-600">
+                Stage {activeStage} of 5
+              </span>
+              <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${(activeStage / 5) * 100}%`,
+                    backgroundColor: '#595F39'
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
