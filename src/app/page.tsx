@@ -381,7 +381,7 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
               </div>
               <h3 className="text-3xl sm:text-4xl font-light text-gray-900 mb-8">Our Vision</h3>
               <p className="text-xl text-gray-900 leading-relaxed font-light">
-                Accelerate business growth with AI solutions that cut complexity, boost performance, and scale with you
+                Make AI feel like a teammate, not a science project.
               </p>
             </motion.div>
             <motion.div
@@ -396,7 +396,8 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
               </div>
               <h3 className="text-3xl sm:text-4xl font-light text-gray-900 mb-8">Our Mission</h3>
               <p className="text-xl text-gray-900 leading-relaxed font-light">
-                Make automation a reality, helping companies worldwide unlock new levels of efficiency and sustainable growth
+                Turn your data and tools into a secure chatbot that answers with sources and triggers real work.
+Roll it out with a clear 5-stage plan. Measure results from day one.
               </p>
             </motion.div>
           </div>
@@ -410,10 +411,10 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             <div className="col-span-2">
               <div className="flex items-center mb-8">
                 <Image src="/henly_ai_icon.png" alt="Henly AI Logo" width={48} height={48} className="h-12 w-12" />
-                <span className="ml-4 text-3xl font-light">Henly AI</span>
+                <span className="ml-4 text-3xl font-light">Henly AI</span><br/><span className="ml-4 text-lg font-light text-gray-400">AI that ships. And sticks.</span>
               </div>
               <p className="text-gray-300 mb-8 leading-relaxed font-light text-lg">
-                Your vision, our expertise. We customize AI solutions to meet your everyday challenges—delivering faster results and freeing you to focus on what really matters.
+                We build secure chatbots and automations that respect your permissions, fit your workflows, and deliver measurable wins—fast.
               </p>
             </div>
             <div>
@@ -426,7 +427,7 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             </div>
             <div>
               <h4 className="font-semibold mb-8 text-xl">Newsletter</h4>
-              <p className="text-gray-300 mb-8 font-light text-lg">START UNLOCKING TIME TODAY!</p>
+              <p className="text-gray-300 mb-8 font-light text-lg">Field notes, not fluff. Real rollout lessons and playbooks, once a month.</p>
               <div className="flex">
                 <input 
                   type="email" 
