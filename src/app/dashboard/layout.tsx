@@ -7,12 +7,10 @@ import { useAuth } from '@/contexts/AuthContext'
 import { 
   MessageSquare, 
   BarChart3, 
-  Users, 
   LogOut,
   Menu,
   X,
   Building2,
-  Search,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
@@ -36,11 +34,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: BarChart3 },
     { name: `${organization?.name || 'AI'} Chatbot`, href: '/dashboard/chatbot', icon: MessageSquare },
-    { name: 'LinkedIn Sales', href: '/dashboard/linkedin', icon: Users },
+        { name: 'Overview', href: '/dashboard', icon: BarChart3 },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Explore', href: '/dashboard/explore', icon: Search },
   ]
 
   if (profile?.role === 'admin' || profile?.role === 'super_admin') {
