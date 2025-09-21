@@ -12,7 +12,8 @@ import {
   X,
   Building2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  BookOpen
 } from 'lucide-react'
 import { AuthProvider } from '@/contexts/AuthContext'
 
@@ -35,8 +36,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: `${organization?.name || 'AI'} Chatbot`, href: '/dashboard/chatbot', icon: MessageSquare },
-        { name: 'Overview', href: '/dashboard', icon: BarChart3 },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Overview & Analytics', href: '/dashboard', icon: BarChart3 },
+    { name: 'AI Insights', href: '/dashboard/insights', icon: BookOpen },
   ]
 
   if (profile?.role === 'admin' || profile?.role === 'super_admin') {
@@ -49,10 +50,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
-          <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
+          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
             <div className="flex items-center">
-              <Image src="/henly_ai_logo.png" alt="Henly AI Cover Logo" width={360} height={80} 
-                className="h-12 w-auto" />
+              <Image src="/henly_ai_logo.png" alt="Henly AI Cover Logo" width={200} height={45} 
+                className="h-9 w-auto" />
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -100,11 +101,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       {/* Desktop sidebar */}
       <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}`}>
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 shadow-sm">
-          <div className="flex h-16 items-center px-4 justify-between border-b border-gray-200">
+          <div className="flex h-16 items-center px-6 justify-between border-b border-gray-200">
             <div className="flex items-center">
               {!sidebarCollapsed && (
                 <Link href="/">
-                  <Image src="/henly_ai_logo.png" alt="Henly AI Cover Logo" width={360} height={80} className="h-12 w-auto" />
+                  <Image src="/henly_ai_logo.png" alt="Henly AI Cover Logo" width={200} height={45} className="h-9 w-auto" />
                 </Link>
               )}
             </div>
