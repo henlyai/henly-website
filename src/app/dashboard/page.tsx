@@ -2,27 +2,16 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { createLinkedInService } from '@/lib/linkedin-service'
-import { LinkedInAnalytics } from '@/lib/linkedin-service'
 import { MessageSquare, Users, Zap, TrendingUp, Clock, CheckCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 export default function DashboardPage() {
   const { profile, organization } = useAuth()
-  const [detailedMetrics, setDetailedMetrics] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Set to false since we're using mock data
   const [showWelcome, setShowWelcome] = useState(false)
   const searchParams = useSearchParams()
   const orgSlug = searchParams.get('org')
-
-  const linkedinService = organization ? createLinkedInService(organization.id) : null
-
-  useEffect(() => {
-    if (linkedinService && organization) {
-      loadDetailedData()
-    }
-  }, [organization?.id]) // Only reload when organization ID changes
 
   useEffect(() => {
     // Show welcome message if coming from verification
@@ -34,55 +23,41 @@ export default function DashboardPage() {
     }
   }, [orgSlug])
 
-  const loadDetailedData = async () => {
-    if (!linkedinService) return
-
-    setLoading(true)
-    try {
-      const metrics = await linkedinService.getDetailedMetrics()
-      setDetailedMetrics(metrics)
-    } catch (error) {
-      console.error('Error loading detailed metrics:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Detailed LinkedIn stats based on real data
+  // Mock chatbot stats
   const stats = [
     {
-      name: 'Connection Rate',
-      value: detailedMetrics ? `${detailedMetrics.connectionRate}%` : '0%',
-      change: '+2%',
-      changeType: 'positive',
-      icon: Users,
-    },
-    {
-      name: 'Response Rate',
-      value: detailedMetrics ? `${detailedMetrics.responseRate}%` : '0%',
-      change: '+5%',
+      name: 'Chat Sessions',
+      value: '387',
+      change: '+12%',
       changeType: 'positive',
       icon: MessageSquare,
     },
     {
-      name: 'Active Conversations',
-      value: detailedMetrics ? `${detailedMetrics.activeConversations}` : '0',
-      change: '+3',
+      name: 'Satisfaction Rate',
+      value: '94%',
+      change: '+3%',
       changeType: 'positive',
-      icon: TrendingUp,
+      icon: Users,
     },
     {
       name: 'Avg Response Time',
-      value: detailedMetrics ? `${detailedMetrics.avgTimeToResponse} days` : '0 days',
-      change: '-1 day',
+      value: '2.3s',
+      change: '-0.5s',
       changeType: 'positive',
       icon: Clock,
+    },
+    {
+      name: 'Active Today',
+      value: '73',
+      change: '+8',
+      changeType: 'positive',
+      icon: TrendingUp,
     },
   ]
 
   // Calculate usage percentage based on your schema
   const usagePercentage = organization 
-    ? Math.round((0 / organization.monthly_token_limit) * 100) // We'll calculate actual usage later
+    ? Math.round((22480 / (organization.monthly_token_limit || 100000)) * 100) // Mock current usage
     : 0
 
   if (loading) {
@@ -122,7 +97,7 @@ export default function DashboardPage() {
                 Welcome to {organization?.name}!
               </h3>
               <p className="text-sm text-green-700 mt-1">
-                Your email has been verified and your organization is ready to go. Start exploring your AI automation tools below.
+                Your email has been verified and your organization is ready to go. Start exploring your AI chatbot below.
               </p>
             </div>
           </div>
@@ -135,7 +110,7 @@ export default function DashboardPage() {
           Welcome back, {profile?.full_name || 'User'}!
         </h1>
         <p className="text-gray-800 mt-1">
-          Your AI assistant is ready to help with {organization?.name}'s automation needs.
+          Your AI chatbot is ready to help with {organization?.name}'s customer support needs.
         </p>
       </div>
 
@@ -158,7 +133,7 @@ export default function DashboardPage() {
                         {stat.value}
                       </div>
                       <div className={`ml-2 flex items-baseline text-sm font-semibold ${
-                        stat.changeType === 'positive' ? 'style="color: #595F39"' : 'text-red-600'
+                        stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {stat.change}
                       </div>
@@ -176,15 +151,18 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900">Monthly Usage</h3>
           <span className="text-sm text-gray-500">
-            0 / {organization?.monthly_token_limit?.toLocaleString()} tokens
+            22,480 / {organization?.monthly_token_limit?.toLocaleString() || '100,000'} tokens
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className={`h-2 rounded-full ${
-              usagePercentage > 80 ? 'bg-red-500' : usagePercentage > 60 ? 'bg-yellow-500' : 'style={{ backgroundColor: "#595F39" }}'
+              usagePercentage > 80 ? 'bg-red-500' : usagePercentage > 60 ? 'bg-yellow-500' : 'bg-green-600'
             }`}
-            style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+            style={{ 
+              width: `${Math.min(usagePercentage, 100)}%`,
+              backgroundColor: usagePercentage <= 60 ? "#595F39" : undefined
+            }}
           />
         </div>
         <p className="text-sm text-gray-800 mt-2">
@@ -193,7 +171,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Services Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         {/* AI Chatbot Service */}
         <div className="bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200">
@@ -205,138 +183,38 @@ export default function DashboardPage() {
           <div className="p-6">
             <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
               <div className="text-center">
-                <MessageSquare className="mx-auto mb-4" style={{ color: "#595F39" }} />
-                <p className="text-gray-800 mb-4">Preview of your AI Chatbot</p>
-                <Link 
-                  href="/dashboard/chatbot"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#595F39]" style={{ backgroundColor: "#595F39" }}
-                >
-                  Open Chatbot
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* LinkedIn Sales Service */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">LinkedIn Sales Agent</h3>
-            <p className="text-sm text-gray-800">
-              Automated lead identification and outreach on LinkedIn.
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <Users className="mx-auto mb-4" style={{ color: "#595F39" }} />
-                <p className="text-gray-800 mb-4">
-                  {detailedMetrics ? (
-                    <>
-                      <span style={{ color: "#595F39" }}>
-                        {detailedMetrics.totalLeads}
-                      </span>
-                      <span className="text-sm">Total Leads</span>
-                    </>
-                  ) : (
-                    'LinkedIn Sales Dashboard'
-                  )}
-                </p>
-                <Link 
-                  href="/dashboard/linkedin"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#595F39]" style={{ backgroundColor: "#595F39" }}
-                >
-                  View Leads
-                </Link>
+                <MessageSquare className="mx-auto mb-4 h-12 w-12" style={{ color: "#595F39" }} />
+                <p className="text-gray-800 mb-4">Your AI Chatbot is ready to assist customers</p>
+                <div className="space-x-4">
+                  <Link 
+                    href="/dashboard/chatbot"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#595F39]" 
+                    style={{ backgroundColor: "#595F39" }}
+                  >
+                    Open Chatbot
+                  </Link>
+                  <Link 
+                    href="/dashboard/analytics"
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#595F39]"
+                  >
+                    View Analytics
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Detailed LinkedIn Metrics */}
-      {detailedMetrics && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Connection & Response Metrics */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Connection & Response Metrics</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Connection Requests Sent</span>
-                <span className="text-lg font-semibold text-gray-900">{detailedMetrics.connectionRequestsSent}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Connections Made</span>
-                <span style={{ color: "#595F39" }}>{detailedMetrics.connectionsMade}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Responses Received</span>
-                <span style={{ color: "#595F39" }}>{detailedMetrics.responses}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Active Conversations</span>
-                <span className="text-lg font-semibold text-purple-600">{detailedMetrics.activeConversations}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Performance Metrics */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Connection Rate</span>
-                <span style={{ color: "#595F39" }}>{detailedMetrics.connectionRate}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Response Rate</span>
-                <span style={{ color: "#595F39" }}>{detailedMetrics.responseRate}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Active Conversation Rate</span>
-                <span className="text-lg font-semibold text-purple-600">{detailedMetrics.activeConversationRate}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800">Avg Messages per Lead</span>
-                <span className="text-lg font-semibold text-gray-900">{detailedMetrics.avgMessagesPerLead}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Pipeline Status */}
-      {detailedMetrics && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Pipeline Status</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Object.entries(detailedMetrics.statusBreakdown).map(([status, count]) => (
-              <div key={status} className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{count as number}</div>
-                <div className="text-sm text-gray-800 capitalize">{status.toLowerCase()}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Link href="/dashboard/chatbot" className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <MessageSquare className="mr-3" style={{ color: "#595F39" }} />
+            <MessageSquare className="mr-3 h-6 w-6" style={{ color: "#595F39" }} />
             <div className="text-left">
               <div className="font-medium text-gray-900">Start Chat</div>
               <div className="text-sm text-gray-500">Open AI chatbot</div>
-            </div>
-          </Link>
-          
-          <Link href="/dashboard/linkedin" className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <Users className="mr-3" style={{ color: "#595F39" }} />
-            <div className="text-left">
-              <div className="font-medium text-gray-900">View Leads</div>
-              <div className="text-sm text-gray-500">Check LinkedIn leads</div>
             </div>
           </Link>
           
@@ -347,8 +225,16 @@ export default function DashboardPage() {
               <div className="text-sm text-gray-500">View performance metrics</div>
             </div>
           </Link>
+
+          <div className="flex items-center p-4 border border-gray-300 rounded-lg bg-gray-50 opacity-60">
+            <Users className="mr-3 h-6 w-6 text-gray-400" />
+            <div className="text-left">
+              <div className="font-medium text-gray-500">Team Settings</div>
+              <div className="text-sm text-gray-400">Coming Soon</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   )
-} 
+}
