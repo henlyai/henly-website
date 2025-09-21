@@ -76,7 +76,7 @@ export default function AIAdoptionProcess() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
-            The Henly rollout: A 5-stage plan that works
+            A 5-stage plan that works
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
             A clear path from idea to impact. Measurable outcomes at each stage.
@@ -187,7 +187,7 @@ export default function AIAdoptionProcess() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                   <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                  We Do
+                  ACTION ITEMS
                 </h4>
                 <div className="space-y-3">
                   {stages[activeStage - 1].weDo.map((item, itemIndex) => (
@@ -201,7 +201,7 @@ export default function AIAdoptionProcess() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                   <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
-                  You Get
+                  DELIVERABLES
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {stages[activeStage - 1].youGet.map((item, itemIndex) => (
@@ -222,7 +222,7 @@ export default function AIAdoptionProcess() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                   <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                  Success Looks Like
+                  SUCCESS MEASURES
                 </h4>
                 <p className="text-gray-600 leading-relaxed font-light">
                   {stages[activeStage - 1].successLooksLike}

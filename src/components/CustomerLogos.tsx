@@ -29,10 +29,10 @@ export default function CustomerLogos() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
-            We put customers first, ensuring every journey is <span style={{ color: '#595F39' }}>seamless</span>
+            When AI has to work, teams choose Henly
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 leading-relaxed font-light max-w-4xl mx-auto">
-            Henly AI empowers clients to navigate AI with ease — delivering efficient, cost-effective solutions and delightful customer experiences, always putting people first
+            End-to-end implimentation and onboarding of a secure chatbot connected to your sources.<br/>Faster cycles, fewer tickets, and hours back, measured from day one.<br/><br/>Insurance, Healthcare, HR, Operations, Marketing and Services
           </p>
         </motion.div>
 
