@@ -32,7 +32,7 @@ export default function CustomerLogos() {
             When AI has to work, teams choose Henly
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 leading-relaxed font-light max-w-4xl mx-auto">
-            End-to-end implimentation and onboarding of a secure chatbot connected to your sources.<br/>Faster cycles, fewer tickets, and hours back, measured from day one.<br/><br/>Insurance, Healthcare, HR, Operations, Marketing and Services
+            End-to-end AI adoption program and implementation of a secure chatbot connected to your sources. Become AI proficient and realize measurable results from day one.
           </p>
         </motion.div>
 

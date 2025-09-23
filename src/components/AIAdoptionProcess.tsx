@@ -79,7 +79,7 @@ export default function AIAdoptionProcess() {
             A 5-stage plan that works
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
-            A clear path from idea to impact. Measurable outcomes at each stage.
+            A clear path from start to impact with measurable outcomes at each stage
           </p>
         </div>
 
