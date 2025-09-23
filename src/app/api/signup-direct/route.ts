@@ -15,9 +15,9 @@ const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, fullName, organizationName } = await request.json()
+    const { email, password, fullName, organizationName, organizationSlug } = await request.json()
     
-    console.log('Signup request:', { email, fullName, organizationName })
+    console.log('Signup request:', { email, fullName, organizationName, organizationSlug })
     
     // Create user first
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
@@ -39,12 +39,13 @@ export async function POST(request: NextRequest) {
     console.log('User ID type:', typeof userId)
     console.log('User ID value:', userId)
     
-    // Create organization (Supabase will handle slug and created_by automatically)
+    // Create organization with slug (trigger will handle if slug is null/empty)
     const { data: orgData, error: orgError } = await (supabaseAdmin as any)
       .from('organizations')
       .insert({
         name: organizationName,
-        // slug and created_by will be set automatically by the trigger
+        slug: organizationSlug || null, // Let trigger generate if not provided
+        created_by: userId
       })
       .select()
       .single()

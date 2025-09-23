@@ -74,6 +74,7 @@ export default function SignupPage() {
           password: formData.password,
           fullName: formData.fullName,
           organizationName: formData.organizationName,
+          organizationSlug: formData.organizationSlug,
         }),
       })
 

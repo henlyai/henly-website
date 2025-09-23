@@ -16,6 +16,22 @@ export interface Database {
           n8n_webhook_url: string | null
           created_at: string
           updated_at: string
+          onboarding_step: string
+          last_activity_at: string
+          total_members: number | null
+          active_members: number | null
+          pending_members: number | null
+          invited_members: number | null
+          admin_count: number | null
+          super_admin_count: number | null
+          organization_health: string | null
+          last_member_activity: string | null
+          pending_invitations: number | null
+          accepted_invitations: number | null
+          creator_id: string | null
+          email_verification_required: boolean
+          signup_completed_at: string | null
+          created_by: string | null
         }
         Insert: {
           id?: string
@@ -31,6 +47,22 @@ export interface Database {
           n8n_webhook_url?: string | null
           created_at?: string
           updated_at?: string
+          onboarding_step?: string
+          last_activity_at?: string
+          total_members?: number | null
+          active_members?: number | null
+          pending_members?: number | null
+          invited_members?: number | null
+          admin_count?: number | null
+          super_admin_count?: number | null
+          organization_health?: string | null
+          last_member_activity?: string | null
+          pending_invitations?: number | null
+          accepted_invitations?: number | null
+          creator_id?: string | null
+          email_verification_required?: boolean
+          signup_completed_at?: string | null
+          created_by?: string | null
         }
         Update: {
           id?: string
@@ -46,6 +78,22 @@ export interface Database {
           n8n_webhook_url?: string | null
           created_at?: string
           updated_at?: string
+          onboarding_step?: string
+          last_activity_at?: string
+          total_members?: number | null
+          active_members?: number | null
+          pending_members?: number | null
+          invited_members?: number | null
+          admin_count?: number | null
+          super_admin_count?: number | null
+          organization_health?: string | null
+          last_member_activity?: string | null
+          pending_invitations?: number | null
+          accepted_invitations?: number | null
+          creator_id?: string | null
+          email_verification_required?: boolean
+          signup_completed_at?: string | null
+          created_by?: string | null
         }
       }
       profiles: {
