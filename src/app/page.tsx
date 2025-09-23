@@ -169,7 +169,7 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto leading-relaxed font-light mb-10"
             >
-              Analyze → Pilot → Deploy.
+              <strong>Analyze → Pilot → Deploy.</strong><br/>
 Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             </motion.p>
 

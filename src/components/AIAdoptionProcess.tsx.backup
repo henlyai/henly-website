@@ -76,17 +76,36 @@ export default function AIAdoptionProcess() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-light text-gray-900 mb-6">
-            A 5-stage plan that works
+            The Henly rollout: A 5-stage plan that works
           </h2>
           <p className="text-xl sm:text-2xl text-gray-900 max-w-4xl mx-auto font-light">
-            A clear path from idea to impact. Measurable outcomes at each stage.
+            Transform your business with AI before your competitors do. Our proven methodology delivers measurable results, 
+            competitive advantage, and future-ready operations that scale with your growth.
           </p>
         </div>
 
         {/* Timeline Navigation */}
         <div className="mb-16">
-          {/* Timeline Nodes */}
+          {/* Progress */}
           <div className="flex justify-center mb-8">
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
+              <span className="text-sm font-medium text-gray-600">
+                Stage {activeStage} of 5
+              </span>
+              <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${(activeStage / 5) * 100}%`,
+                    backgroundColor: '#595F39'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Nodes */}
+          <div className="flex justify-center">
             <div className="flex items-center space-x-8">
               {stages.map((stage) => (
                 <button
@@ -106,32 +125,17 @@ export default function AIAdoptionProcess() {
                   >
                     {stage.id}
                   </div>
-                  <span className={`
+                                    <span className={`
                     mt-3 text-sm font-medium transition-colors duration-300
                     ${activeStage === stage.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-800'}
                   `}>
                     {stage.label}
                   </span>
+                  <span 
+                    {stage.timeline}
+                  </span>
                 </button>
               ))}
-            </div>
-          </div>
-
-          {/* Progress Bar - Now below the stage numbers */}
-          <div className="flex justify-center">
-            <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-6 py-3">
-              <span className="text-sm font-medium text-gray-600">
-                Stage {activeStage} of 5
-              </span>
-              <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${(activeStage / 5) * 100}%`,
-                    backgroundColor: '#595F39'
-                  }}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -187,7 +191,7 @@ export default function AIAdoptionProcess() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                   <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                  ACTION ITEMS
+                  We Do
                 </h4>
                 <div className="space-y-3">
                   {stages[activeStage - 1].weDo.map((item, itemIndex) => (
@@ -201,7 +205,7 @@ export default function AIAdoptionProcess() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                   <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#9C8B5E' }} />
-                  DELIVERABLES
+                  You Get
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {stages[activeStage - 1].youGet.map((item, itemIndex) => (
@@ -222,7 +226,7 @@ export default function AIAdoptionProcess() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center">
                   <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: '#595F39' }} />
-                  SUCCESS MEASURES
+                  Success Looks Like
                 </h4>
                 <p className="text-gray-600 leading-relaxed font-light">
                   {stages[activeStage - 1].successLooksLike}
