@@ -1,0 +1,20 @@
+# =============================================
+# HENLY LIBRECHAT MARKETPLACE CONFIGURATION
+# Add these to your LibreChat .env file
+# =============================================
+
+# Supabase Configuration for Organization Management
+SUPABASE_URL=https://rgourmmwhokdixjwlcmw.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnb3VybW13aG9rZGl4andsY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwNTY2MzMsImV4cCI6MjA3MzYzMjYzM30.0k0T8AZfB65T7dR7PaTMu6KLY8o8QaQEnbAFvdNL-hY
+
+# JWT Secret for token verification (should match your Henly website)
+SUPABASE_JWT_SECRET=your-jwt-secret
+
+# Organization Management
+ENABLE_ORGANIZATION_ISOLATION=true
+AUTO_SETUP_DEFAULT_CONTENT=true
+
+# Default Content Settings
+DEFAULT_AGENTS_COUNT=5
+DEFAULT_PROMPTS_COUNT=5
+SETUP_TIMEOUT_MINUTES=5

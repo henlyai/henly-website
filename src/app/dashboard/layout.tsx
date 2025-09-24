@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  Store
+  Shield
 } from 'lucide-react'
 import { AuthProvider } from '@/contexts/AuthContext'
 
@@ -43,6 +43,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (profile?.role === 'admin' || profile?.role === 'super_admin') {
     navigation.push({ name: 'Admin', href: '/dashboard/admin', icon: Building2 })
+  }
+
+  if (profile?.role === 'super_admin') {
+    navigation.push({ name: 'Super Admin', href: '/dashboard/super-admin', icon: Shield })
   }
 
   return (
