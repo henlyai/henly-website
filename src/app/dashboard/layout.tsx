@@ -13,7 +13,8 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  BookOpen
+  BookOpen,
+  Store
 } from 'lucide-react'
 import { AuthProvider } from '@/contexts/AuthContext'
 
@@ -36,6 +37,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: `${organization?.name || 'AI'} Chatbot`, href: '/dashboard/chatbot', icon: MessageSquare },
+    { name: 'Agent Marketplace', href: '/dashboard/marketplace', icon: Store },
     { name: 'Overview & Analytics', href: '/dashboard', icon: BarChart3 },
     { name: 'AI Insights', href: '/dashboard/insights', icon: BookOpen },
   ]
