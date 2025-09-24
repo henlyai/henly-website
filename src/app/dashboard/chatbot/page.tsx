@@ -27,6 +27,21 @@ export default function ChatbotPage() {
         const libreChatBaseUrl = process.env.NEXT_PUBLIC_LIBRECHAT_URL || 'https://scalewize-production-chatbot-production.up.railway.app'
         console.log('Attempting LibreChat connection to:', libreChatBaseUrl)
         
+        // First, try to setup default content for the organization (idempotent operation)
+        try {
+          await fetch(`${libreChatBaseUrl}/api/marketplace/setup`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+            },
+          });
+          console.log('Default content setup completed (or already exists)');
+        } catch (setupError) {
+          console.log('Default content setup skipped:', setupError.message);
+        }
+        
         const res = await fetch(`${libreChatBaseUrl}/api/auth/sso/librechat`, {
           method: 'POST',
           credentials: 'include', // send cookies (if any)
@@ -72,7 +87,7 @@ export default function ChatbotPage() {
             <div>
               <h3 className="text-lg font-medium text-gray-900">{organization?.name || 'AI'} Chatbot</h3>
               <p className="text-sm text-gray-800">
-                Powered by Henly AI - Connected to your business systems and databases
+                Build custom AI agents, create prompt templates, and access your business intelligence - all in one powerful interface
               </p>
             </div>
             <div className="flex items-center space-x-2">
