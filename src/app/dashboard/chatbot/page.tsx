@@ -24,14 +24,29 @@ export default function ChatbotPage() {
         const { data: { session } } = await supabase.auth.getSession();
         const accessToken = session?.access_token;
         // Call your backend SSO endpoint
-        const libreChatBaseUrl = process.env.NEXT_PUBLIC_LIBRECHAT_URL || 'https://localhost:3080'
+        const libreChatBaseUrl = process.env.NEXT_PUBLIC_LIBRECHAT_URL || 'https://scalewize-production-chatbot-production.up.railway.app'
+        console.log('Attempting LibreChat connection to:', libreChatBaseUrl)
+        
         const res = await fetch(`${libreChatBaseUrl}/api/auth/sso/librechat`, {
           method: 'POST',
           credentials: 'include', // send cookies (if any)
-          headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {},
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+          },
         })
-        if (!res.ok) throw new Error('Failed to get LibreChat session')
+        
+        console.log('LibreChat SSO response status:', res.status)
+        
+        if (!res.ok) {
+          const errorText = await res.text()
+          console.error('LibreChat SSO error:', errorText)
+          throw new Error(`Failed to get LibreChat session: ${res.status} ${errorText}`)
+        }
+        
         const { libreSession } = await res.json()
+        console.log('LibreChat session received:', !!libreSession)
+        
         // Build the LibreChat URL (use HTTPS)
         setLibreChatUrl(libreChatBaseUrl.replace('http://', 'https://'))
       } catch (err) {

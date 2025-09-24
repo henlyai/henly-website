@@ -80,7 +80,7 @@ class MarketplaceService {
       const headers = await this.getAuthHeaders()
       const params = new URLSearchParams()
       
-      if (filters.category && filters.category !== 'all') {
+      if (filters.category && filters.category !== 'general') {
         params.append('category', filters.category)
       }
       if (filters.search) {
@@ -164,7 +164,7 @@ class MarketplaceService {
       const headers = await this.getAuthHeaders()
       const params = new URLSearchParams()
       
-      if (filters.category && filters.category !== 'all') {
+      if (filters.category && filters.category !== 'general') {
         params.append('category', filters.category)
       }
       if (filters.search) {

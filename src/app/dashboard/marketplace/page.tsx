@@ -27,7 +27,7 @@ export default function MarketplacePage() {
   const { user, organization } = useAuth()
   const [activeTab, setActiveTab] = useState<'agents' | 'prompts'>('agents')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedCategory, setSelectedCategory] = useState('general')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [agents, setAgents] = useState<MarketplaceAgent[]>([])
   const [prompts, setPrompts] = useState<MarketplacePrompt[]>([])
@@ -85,13 +85,17 @@ export default function MarketplacePage() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+              <button 
+                onClick={() => window.open(`${process.env.NEXT_PUBLIC_LIBRECHAT_URL}`, '_blank')}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                 style={{ focusRingColor: '#595F39' }}
               >
                 <Upload className="mr-2 h-4 w-4" />
                 Publish Content
               </button>
-              <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+              <button 
+                onClick={() => window.open(`${process.env.NEXT_PUBLIC_LIBRECHAT_URL}`, '_blank')}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                 style={{ backgroundColor: '#595F39', focusRingColor: '#595F39' }}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -211,7 +215,9 @@ export default function MarketplacePage() {
                       Get started by creating your first AI agent or browse the public marketplace.
                     </p>
                     <div className="mt-6">
-                      <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90"
+                      <button 
+                        onClick={() => window.open(`${process.env.NEXT_PUBLIC_LIBRECHAT_URL}`, '_blank')}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90"
                         style={{ backgroundColor: '#595F39' }}
                       >
                         <Plus className="mr-2 h-4 w-4" />
@@ -237,7 +243,9 @@ export default function MarketplacePage() {
                       Get started by creating your first prompt template or browse the public library.
                     </p>
                     <div className="mt-6">
-                      <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90"
+                      <button 
+                        onClick={() => window.open(`${process.env.NEXT_PUBLIC_LIBRECHAT_URL}`, '_blank')}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-90"
                         style={{ backgroundColor: '#595F39' }}
                       >
                         <Plus className="mr-2 h-4 w-4" />
