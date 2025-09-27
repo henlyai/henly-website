@@ -28,7 +28,7 @@ export default function GoogleCalendarBooking({
   const getVariantStyles = () => {
     switch (variant) {
       case 'nav':
-        return 'text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer'
+        return 'text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer border border-white/20'
       case 'secondary':
         return 'inline-flex items-center text-gray-800 hover:text-gray-900 px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out cursor-pointer'
       case 'primary':
@@ -40,7 +40,7 @@ export default function GoogleCalendarBooking({
   const getBackgroundColor = () => {
     switch (variant) {
       case 'nav':
-        return '#595F39'
+        return 'transparent'
       case 'secondary':
         return 'white'
       case 'primary':

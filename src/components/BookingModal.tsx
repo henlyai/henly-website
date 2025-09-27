@@ -69,7 +69,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white">Book Your Consultation</h2>
+                  <h2 className="text-xl font-semibold text-white" style={{ color: 'white !important' }}>Book Your Consultation</h2>
                   <p className="text-white/80 text-sm">Schedule your free AI adoption strategy call</p>
                 </div>
               </div>
