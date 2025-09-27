@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
 
 interface GoogleCalendarBookingProps {
   variant?: 'primary' | 'secondary' | 'nav'
@@ -14,69 +14,25 @@ export default function GoogleCalendarBooking({
   className = '',
   children 
 }: GoogleCalendarBookingProps) {
-  const buttonRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    // Load Google Calendar scheduling script
-    const loadGoogleCalendarScript = () => {
-      // Check if script is already loaded
-      if (window.calendar?.schedulingButton) {
-        initializeButton()
-        return
-      }
-
-      // Load CSS
-      const link = document.createElement('link')
-      link.href = 'https://calendar.google.com/calendar/scheduling-button-script.css'
-      link.rel = 'stylesheet'
-      document.head.appendChild(link)
-
-      // Load JS
-      const script = document.createElement('script')
-      script.src = 'https://calendar.google.com/calendar/scheduling-button-script.js'
-      script.async = true
-      script.onload = () => {
-        initializeButton()
-      }
-      document.head.appendChild(script)
-    }
-
-    const initializeButton = () => {
-      if (buttonRef.current && window.calendar?.schedulingButton) {
-        // Clear any existing content
-        buttonRef.current.innerHTML = ''
-        
-        // Initialize the Google Calendar button
-        window.calendar.schedulingButton.load({
-          url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ177Cvvmjwy7CFeRTF8UViTTql42t2sKPhS5DFPlXJv0w4yPGa9uLKRN_nwtR3AHAsv9SoFeOdR?gv=true',
-          color: '#595F39', // Use Henly AI brand color
-          label: 'Book a Call',
-          target: buttonRef.current,
-        })
-      }
-    }
-
-    // Load the script when component mounts
-    loadGoogleCalendarScript()
-
-    // Cleanup function
-    return () => {
-      if (buttonRef.current) {
-        buttonRef.current.innerHTML = ''
-      }
-    }
-  }, [])
+  const handleBookingClick = () => {
+    // Open Google Calendar booking in a new tab
+    window.open(
+      'https://calendar.google.com/calendar/appointments/schedules/AcZssZ177Cvvmjwy7CFeRTF8UViTTql42t2sKPhS5DFPlXJv0w4yPGa9uLKRN_nwtR3AHAsv9SoFeOdR?gv=true',
+      '_blank',
+      'noopener,noreferrer'
+    )
+  }
 
   // Custom styling based on variant
   const getVariantStyles = () => {
     switch (variant) {
       case 'nav':
-        return 'text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl'
+        return 'text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer'
       case 'secondary':
-        return 'inline-flex items-center text-gray-800 hover:text-gray-900 px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50'
+        return 'inline-flex items-center text-gray-800 hover:text-gray-900 px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 cursor-pointer'
       case 'primary':
       default:
-        return 'inline-flex items-center text-white px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl'
+        return 'inline-flex items-center text-white px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl cursor-pointer'
     }
   }
 
@@ -99,27 +55,14 @@ export default function GoogleCalendarBooking({
       transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className={className}
     >
-      <div
-        ref={buttonRef}
+      <button
+        onClick={handleBookingClick}
         className={getVariantStyles()}
         style={{ backgroundColor: getBackgroundColor() }}
-      />
+      >
+        {children || 'Book a Call'}
+        {variant === 'primary' && !children && <ArrowRight className="ml-3 h-5 w-5" />}
+      </button>
     </motion.div>
   )
-}
-
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    calendar?: {
-      schedulingButton: {
-        load: (config: {
-          url: string
-          color: string
-          label: string
-          target: HTMLElement
-        }) => void
-      }
-    }
-  }
 }
