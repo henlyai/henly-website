@@ -7,6 +7,7 @@ import { motion, useAnimation } from 'framer-motion'
 import { ArrowRight, Shield, Zap, Users, BarChart3, Clock, DollarSign, TrendingUp, MessageSquare, UserCheck, Settings, Play, Star, CheckCircle } from 'lucide-react'
 import CustomerLogos from '@/components/CustomerLogos'
 import AIAdoptionProcess from '@/components/AIAdoptionProcess'
+import GoogleCalendarBooking from '@/components/GoogleCalendarBooking'
 
 // Particle component for the animation
 const Particle = ({ delay, startX, startY, targetX, targetY }: {
@@ -128,13 +129,7 @@ export default function Home() {
               <Link href="/login" className="text-gray-800 hover:text-gray-900 px-4 py-2 text-sm font-medium transition-colors">
                 Log In
               </Link>
-              <Link 
-                href="#book-call" 
-                className="text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                style={{ backgroundColor: '#595F39' }}
-              >
-                Book a Call
-              </Link>
+              <GoogleCalendarBooking variant="nav" />
             </div>
           </div>
         </div>
@@ -180,20 +175,10 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
               transition={{ duration: 1, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-              >
-                <Link 
-                  href="#book-call" 
-                  className="inline-flex items-center text-white px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl"
-                  style={{ backgroundColor: '#595F39' }}
-                >
-                  Book a Call
-                  <ArrowRight className="ml-3 h-5 w-5" />
-                </Link>
-              </motion.div>
+              <GoogleCalendarBooking variant="primary">
+                Book a Call
+                <ArrowRight className="ml-3 h-5 w-5" />
+              </GoogleCalendarBooking>
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -309,20 +294,13 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             <p className="text-xl sm:text-2xl text-white/90 mb-12 leading-relaxed font-light max-w-3xl mx-auto">
               Book a free AI adoption strategy consultation and chatbot implementation assessment
             </p>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            <GoogleCalendarBooking 
+              variant="primary" 
+              className="inline-flex items-center bg-white hover:bg-gray-50 px-12 py-5 rounded-2xl text-xl font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl"
             >
-              <Link 
-                href="#book-call" 
-                className="inline-flex items-center bg-white hover:bg-gray-50 px-12 py-5 rounded-2xl text-xl font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl"
-                style={{ color: '#595F39' }}
-              >
-                Book Now
-                <ArrowRight className="ml-4 h-6 w-6" />
-              </Link>
-            </motion.div>
+              Book Now
+              <ArrowRight className="ml-4 h-6 w-6" />
+            </GoogleCalendarBooking>
           </motion.div>
         </div>
       </section>
