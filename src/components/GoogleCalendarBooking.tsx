@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import BookingModal from './BookingModal'
 
 interface GoogleCalendarBookingProps {
   variant?: 'primary' | 'secondary' | 'nav'
@@ -14,13 +16,10 @@ export default function GoogleCalendarBooking({
   className = '',
   children 
 }: GoogleCalendarBookingProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const handleBookingClick = () => {
-    // Open Google Calendar booking in a new tab
-    window.open(
-      'https://calendar.google.com/calendar/appointments/schedules/AcZssZ177Cvvmjwy7CFeRTF8UViTTql42t2sKPhS5DFPlXJv0w4yPGa9uLKRN_nwtR3AHAsv9SoFeOdR?gv=true',
-      '_blank',
-      'noopener,noreferrer'
-    )
+    setIsModalOpen(true)
   }
 
   // Custom styling based on variant
@@ -49,20 +48,27 @@ export default function GoogleCalendarBooking({
   }
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className={className}
-    >
-      <button
-        onClick={handleBookingClick}
-        className={getVariantStyles()}
-        style={{ backgroundColor: getBackgroundColor() }}
+    <>
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className={className}
       >
-        {children || 'Book a Call'}
-        {variant === 'primary' && !children && <ArrowRight className="ml-3 h-5 w-5" />}
-      </button>
-    </motion.div>
+        <button
+          onClick={handleBookingClick}
+          className={getVariantStyles()}
+          style={{ backgroundColor: getBackgroundColor() }}
+        >
+          {children || 'Book a Call'}
+          {variant === 'primary' && !children && <ArrowRight className="ml-3 h-5 w-5" />}
+        </button>
+      </motion.div>
+      
+      <BookingModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
   )
 }
