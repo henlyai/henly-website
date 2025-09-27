@@ -47,7 +47,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           onClick={handleBackdropClick}
         >
           {/* Backdrop */}
@@ -129,7 +129,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
             <div className="p-6 bg-gray-50 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
-                  <p>Need help? Contact us at <span className="font-medium text-[#595F39]">hello@henly.ai</span></p>
+                  <p>Need help? Contact us at <span className="font-medium text-[#595F39]">fabio@henly.ai</span></p>
                 </div>
                 <button
                   onClick={onClose}

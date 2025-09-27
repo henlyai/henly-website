@@ -9,12 +9,14 @@ interface GoogleCalendarBookingProps {
   variant?: 'primary' | 'secondary' | 'nav'
   className?: string
   children?: React.ReactNode
+  style?: React.CSSProperties
 }
 
 export default function GoogleCalendarBooking({ 
   variant = 'primary', 
   className = '',
-  children 
+  children,
+  style
 }: GoogleCalendarBookingProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -58,7 +60,7 @@ export default function GoogleCalendarBooking({
         <button
           onClick={handleBookingClick}
           className={getVariantStyles()}
-          style={{ backgroundColor: getBackgroundColor() }}
+          style={{ backgroundColor: getBackgroundColor(), ...style }}
         >
           {children || 'Book a Call'}
           {variant === 'primary' && !children && <ArrowRight className="ml-3 h-5 w-5" />}
