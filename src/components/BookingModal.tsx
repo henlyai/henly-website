@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Calendar, Clock, User, MapPin } from 'lucide-react'
+import { createPortal } from 'react-dom'
 
 interface BookingModalProps {
   isOpen: boolean
@@ -39,7 +40,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
     }
   }
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -48,6 +49,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={handleBackdropClick}
         >
           {/* Backdrop */}
@@ -60,6 +62,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden"
+            style={{ position: 'relative', zIndex: 10000 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -144,4 +147,11 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
       )}
     </AnimatePresence>
   )
+
+  // Use portal to render modal at document body level
+  if (typeof window !== 'undefined') {
+    return createPortal(modalContent, document.body)
+  }
+  
+  return modalContent
 }
