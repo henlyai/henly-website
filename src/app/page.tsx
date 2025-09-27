@@ -295,9 +295,9 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
               Book a free AI adoption strategy consultation and chatbot implementation assessment
             </p>
             <GoogleCalendarBooking 
-              variant="primary" 
-              className="inline-flex items-center bg-white hover:bg-gray-50 px-12 py-5 rounded-2xl text-xl font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl"
-              style={{ color: '#595F39' }}
+              variant="secondary" 
+              className="inline-flex items-center px-12 py-5 rounded-2xl text-xl font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl"
+              style={{ color: '#595F39', backgroundColor: 'white' }}
             >
               Book Now
               <ArrowRight className="ml-4 h-6 w-6" />

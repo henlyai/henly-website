@@ -30,7 +30,7 @@ export default function GoogleCalendarBooking({
       case 'nav':
         return 'text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer'
       case 'secondary':
-        return 'inline-flex items-center text-gray-800 hover:text-gray-900 px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 cursor-pointer'
+        return 'inline-flex items-center text-gray-800 hover:text-gray-900 px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out cursor-pointer'
       case 'primary':
       default:
         return 'inline-flex items-center text-white px-12 py-4 rounded-2xl text-lg font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl cursor-pointer'
@@ -42,7 +42,7 @@ export default function GoogleCalendarBooking({
       case 'nav':
         return '#595F39'
       case 'secondary':
-        return 'transparent'
+        return 'white'
       case 'primary':
       default:
         return '#595F39'
