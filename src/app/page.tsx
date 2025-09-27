@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { ArrowRight, Shield, Zap, Users, BarChart3, Clock, DollarSign, TrendingUp, MessageSquare, UserCheck, Settings, Play, Star, CheckCircle } from 'lucide-react'
+import { Shield, Zap, Users, BarChart3, Clock, DollarSign, TrendingUp, MessageSquare, UserCheck, Settings, Play, Star, CheckCircle } from 'lucide-react'
 import CustomerLogos from '@/components/CustomerLogos'
 import AIAdoptionProcess from '@/components/AIAdoptionProcess'
 import GoogleCalendarBooking from '@/components/GoogleCalendarBooking'
@@ -175,10 +175,7 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
               transition={{ duration: 1, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
-              <GoogleCalendarBooking variant="primary">
-                Book a Call
-                <ArrowRight className="ml-3 h-5 w-5" />
-              </GoogleCalendarBooking>
+              <GoogleCalendarBooking variant="primary" />
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -297,10 +294,7 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             <GoogleCalendarBooking 
               variant="primary" 
               className="inline-flex items-center bg-white hover:bg-gray-50 px-12 py-5 rounded-2xl text-xl font-medium transition-all duration-500 ease-out shadow-xl hover:shadow-2xl"
-            >
-              Book Now
-              <ArrowRight className="ml-4 h-6 w-6" />
-            </GoogleCalendarBooking>
+            />
           </motion.div>
         </div>
       </section>

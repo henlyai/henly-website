@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
 
 interface GoogleCalendarBookingProps {
   variant?: 'primary' | 'secondary' | 'nav'
@@ -104,9 +103,7 @@ export default function GoogleCalendarBooking({
         ref={buttonRef}
         className={getVariantStyles()}
         style={{ backgroundColor: getBackgroundColor() }}
-      >
-        {children}
-      </div>
+      />
     </motion.div>
   )
 }
