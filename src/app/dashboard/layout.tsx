@@ -36,8 +36,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const navigation = [
-    { name: `${organization?.name || 'AI'} Chatbot`, href: '/dashboard/chatbot', icon: MessageSquare },
     { name: 'Overview & Analytics', href: '/dashboard', icon: BarChart3 },
+    { name: `${organization?.name || 'AI'} Chatbot`, href: '/dashboard/chatbot', icon: MessageSquare },
     { name: 'AI Insights', href: '/dashboard/insights', icon: BookOpen },
   ]
 
@@ -184,7 +184,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
         {/* Main content */}
         <main className="min-h-screen bg-gray-50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <div className="px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </div>
         </main>
