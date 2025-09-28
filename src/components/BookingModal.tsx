@@ -66,7 +66,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-[#595F39] to-[#7A8B5A]">
+            <div className="modal-header flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-[#595F39] to-[#7A8B5A]">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-white" />

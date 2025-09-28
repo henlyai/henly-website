@@ -37,6 +37,14 @@ h1, h2, h3, h4, h5, h6 {
   color: #171717; /* Ensure headings are always dark */
 }
 
+/* Override for white text in dark sections */
+footer h4,
+footer .text-white,
+.modal-header h2,
+.modal-header .text-white {
+  color: white !important;
+}
+
 /* Smooth Animations */
 * {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
