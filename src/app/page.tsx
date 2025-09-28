@@ -397,24 +397,24 @@ Roll it out with a clear 5-stage plan. Measure results from day one.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-8 text-xl">Locations</h4>
-              <div className="space-y-4 text-gray-300 font-light text-lg">
+              <h4 className="font-semibold mb-8 text-xl text-white">Locations</h4>
+              <div className="space-y-4 text-gray-200 font-light text-lg">
                 <p>Calgary, Canada</p>
                 <p>Copenhagen, Denmark</p>
                 <p>Toronto, Canada</p>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-8 text-xl">Newsletter</h4>
-              <p className="text-gray-300 mb-8 font-light text-lg">Field notes, not fluff. Real rollout lessons and playbooks, once a month.</p>
-              <div className="flex">
+              <h4 className="font-semibold mb-8 text-xl text-white">Newsletter</h4>
+              <p className="text-gray-200 mb-8 font-light text-lg">Field notes, not fluff. Real rollout lessons and playbooks, once a month.</p>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input 
                   type="email" 
                   placeholder="Email*" 
-                  className="flex-1 px-6 py-4 bg-gray-800 border border-gray-700 rounded-l-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 text-lg"
+                  className="flex-1 px-6 py-4 bg-gray-800 border border-gray-700 rounded-xl sm:rounded-l-xl sm:rounded-r-none text-white placeholder-gray-400 focus:outline-none focus:ring-2 text-lg"
                   style={{ '--tw-ring-color': '#595F39' } as React.CSSProperties}
                 />
-                <button className="px-8 py-4 rounded-r-xl text-white font-medium transition-colors hover:opacity-90 text-lg" style={{ backgroundColor: '#595F39' }}>
+                <button className="px-8 py-4 rounded-xl sm:rounded-l-none sm:rounded-r-xl text-white font-medium transition-colors hover:opacity-90 text-lg whitespace-nowrap" style={{ backgroundColor: '#595F39' }}>
                   Subscribe
                 </button>
               </div>

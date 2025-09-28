@@ -51,21 +51,17 @@ export default function GoogleCalendarBooking({
 
   return (
     <>
-      <motion.div
+      <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className={className}
+        onClick={handleBookingClick}
+        className={`${getVariantStyles()} ${className}`}
+        style={{ backgroundColor: getBackgroundColor(), ...style }}
       >
-        <button
-          onClick={handleBookingClick}
-          className={getVariantStyles()}
-          style={{ backgroundColor: getBackgroundColor(), ...style }}
-        >
-          {children || 'Book a Call'}
-          {variant === 'primary' && !children && <ArrowRight className="ml-3 h-5 w-5" />}
-        </button>
-      </motion.div>
+        {children || 'Book a Call'}
+        {variant === 'primary' && !children && <ArrowRight className="ml-3 h-5 w-5" />}
+      </motion.button>
       
       <BookingModal 
         isOpen={isModalOpen} 
