@@ -24,6 +24,9 @@ interface OrganizationMember {
   is_active: boolean
   created_at: string
   last_login: string | null
+  is_verified: boolean
+  email_verified_at: string | null
+  status: string
 }
 
 interface Invitation {
@@ -68,11 +71,18 @@ export default function AdminPage() {
 
   const loadMembers = async () => {
     try {
-      // This would be an API call to get organization members
-      // For now, we'll show a placeholder
-      setMembers([])
+      const response = await fetch('/api/members')
+
+      if (response.ok) {
+        const result = await response.json()
+        setMembers(result.data || [])
+      } else {
+        console.error('Failed to load members:', await response.text())
+        setMembers([])
+      }
     } catch (error) {
       console.error('Error loading members:', error)
+      setMembers([])
     }
   }
 
@@ -83,6 +93,10 @@ export default function AdminPage() {
       if (response.ok) {
         const result = await response.json()
         setInvitations(result.data || [])
+        
+        // Also reload members when invitations are loaded
+        // This ensures we get the latest member list if someone just accepted an invitation
+        loadMembers()
       } else {
         console.error('Failed to load invitations:', await response.text())
         setInvitations([])
@@ -334,6 +348,16 @@ export default function AdminPage() {
                     <div className="flex items-center space-x-2">
                       {getRoleIcon(member.role)}
                       <span className="text-sm text-gray-800 capitalize">{member.role.replace('_', ' ')}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {member.is_verified ? (
+                        <CheckCircle className="h-4 w-4 text-green-600" title="Email verified" />
+                      ) : (
+                        <Clock className="h-4 w-4 text-yellow-600" title="Email not verified" />
+                      )}
+                      <span className="text-sm text-gray-500">
+                        {member.is_verified ? 'Verified' : 'Pending verification'}
+                      </span>
                     </div>
                     <div className="text-sm text-gray-500">
                       {member.last_login ? `Last active: ${new Date(member.last_login).toLocaleDateString()}` : 'Never active'}

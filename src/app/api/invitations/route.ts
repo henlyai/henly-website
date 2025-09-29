@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
     const organizationId = (profile as any).organization_id
 
-    // Fetch invitations for the organization
+    // Fetch invitations for the organization - exclude accepted ones
     const { data: invitations, error: invitationsError } = await supabaseAdmin
       .from('invitations')
       .select(`
@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
         )
       `)
       .eq('organization_id', organizationId)
+      .neq('status', 'accepted') // Exclude accepted invitations
       .order('created_at', { ascending: false })
 
     if (invitationsError) {
