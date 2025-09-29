@@ -41,11 +41,14 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(route)
   )
 
-  // Define auth routes (login, signup)
+  // Define auth routes (login, signup) - but exclude invitation signup routes
   const authRoutes = ['/login', '/signup']
   const isAuthRoute = authRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
+  
+  // Check if this is an invitation signup route that should be allowed even with session
+  const isInvitationSignup = request.nextUrl.pathname.startsWith('/signup/invite/')
 
   // If accessing protected route without session, redirect to login
   if (isProtectedRoute && !session) {
@@ -55,7 +58,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // If accessing auth routes with session, redirect to dashboard
-  if (isAuthRoute && session) {
+  // BUT allow invitation signup routes to proceed even with session
+  if (isAuthRoute && session && !isInvitationSignup) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

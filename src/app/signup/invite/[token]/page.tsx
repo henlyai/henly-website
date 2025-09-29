@@ -135,13 +135,9 @@ export default function InvitationSignupPage() {
         return
       }
 
-      // Success! Redirect to verification pending page
-      if (result.emailSent) {
-        router.push(`/verify-email-pending?email=${encodeURIComponent(formData.email)}&org=${encodeURIComponent(invitation?.organizationName || '')}&invitation=true`)
-      } else {
-        // If no email was sent (development mode), go directly to dashboard
-        router.push('/dashboard')
-      }
+      // Success! Always redirect to verification pending page
+      // This ensures users go through the proper verification flow
+      router.push(`/verify-email-pending?email=${encodeURIComponent(formData.email)}&org=${encodeURIComponent(invitation?.organizationName || '')}&invitation=true`)
       
     } catch (error) {
       console.error('Signup error:', error)

@@ -30,7 +30,6 @@ export default function InviteAcceptancePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [accepting, setAccepting] = useState(false)
-  const [accepted, setAccepted] = useState(false)
   const [user, setUser] = useState<any>(null)
 
   const token = params.token as string
@@ -97,22 +96,9 @@ export default function InviteAcceptancePage() {
       setAccepting(true)
       setError(null)
 
-      // TODO: Implement actual invitation acceptance logic
-      // This would involve:
-      // 1. Verifying the invitation token
-      // 2. Adding the user to the organization
-      // 3. Updating the invitation status
-      // 4. Redirecting to the dashboard
-
-      // For now, simulate the acceptance
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      setAccepted(true)
-      
-      // Redirect to invitation-specific signup page after a short delay
-      setTimeout(() => {
-        router.push(`/signup/invite/${token}`)
-      }, 2000)
+      // Redirect directly to invitation-specific signup page
+      // No need to simulate acceptance - the signup page will handle the actual invitation acceptance
+      router.push(`/signup/invite/${token}`)
 
     } catch (err) {
       console.error('Error accepting invitation:', err)
@@ -157,21 +143,6 @@ export default function InviteAcceptancePage() {
     )
   }
 
-  if (accepted) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
-          <CheckCircle className="mx-auto mb-4" style={{ color: "#595F39" }} />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Welcome to the Team!</h2>
-          <p className="text-gray-600 mb-6">
-            You've successfully joined {invitation?.organizationName}. 
-            Redirecting you to the dashboard...
-          </p>
-          <Loader2 style={{ color: "#595F39" }} />
-        </div>
-      </div>
-    )
-  }
 
   if (!invitation) {
     return null
