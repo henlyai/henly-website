@@ -240,36 +240,39 @@ export default function InviteAcceptancePage() {
             Go to Homepage
           </button>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 mb-6">
                 Click "Accept Invitation" to join this organization. You'll be redirected to create an account or sign in.
               </p>
-              <button
-                onClick={handleAcceptInvitation}
-                disabled={accepting}
-                className="text-white py-2 px-4 rounded-md hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center" style={{ backgroundColor: "#595F39" }}
-              >
-                {accepting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Accepting...
-                  </>
-                ) : (
-                  <>
-                    <Shield className="h-4 w-4 mr-2" />
-                    Accept Invitation
-                  </>
-                )}
-              </button>
               
-              <button
-                onClick={handleDeclineInvitation}
-                disabled={accepting}
-                className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50"
-              >
-                Decline
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={handleAcceptInvitation}
+                  disabled={accepting}
+                  className="w-full text-white py-3 px-4 rounded-md hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-medium" style={{ backgroundColor: "#595F39" }}
+                >
+                  {accepting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Accepting...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="h-4 w-4 mr-2" />
+                      Accept Invitation
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  onClick={handleDeclineInvitation}
+                  disabled={accepting}
+                  className="w-full bg-gray-200 text-gray-800 py-3 px-4 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 font-medium"
+                >
+                  Decline
+                </button>
+              </div>
             </div>
           </div>
         )}
