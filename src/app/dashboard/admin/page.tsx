@@ -307,7 +307,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={inviteLoading}
-              className="text-white rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#595F39] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: "#595F39" }}
+              className="px-4 py-2 text-sm font-medium text-white rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#595F39] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: "#595F39" }}
             >
               {inviteLoading ? 'Sending...' : 'Send Invite'}
             </button>
@@ -334,10 +334,8 @@ export default function AdminPage() {
               {members.map((member) => (
                 <div key={member.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center" style={{ backgroundColor: "#595F39" }}>
-                      <span className="text-sm font-medium text-white">
-                        {member.full_name?.charAt(0) || member.email.charAt(0)}
-                      </span>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white shadow-sm" style={{ backgroundColor: "#595F39" }}>
+                      {member.full_name?.charAt(0) || member.email.charAt(0)}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">{member.full_name}</p>

@@ -206,11 +206,16 @@ export default function LoginPageInner() {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-3">
             <p className="text-sm" style={{ color: '#000' }}>
               Don't have an account?{' '}
               <Link href="/signup" className="font-medium" style={{ color: '#595F39' }}>
                 Sign up
+              </Link>
+            </p>
+            <p className="text-sm" style={{ color: '#000' }}>
+              <Link href="/forgot-password" className="font-medium" style={{ color: '#595F39' }}>
+                Forgot your password?
               </Link>
             </p>
           </div>

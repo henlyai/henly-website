@@ -208,7 +208,14 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
             
             {/* Video Container */}
             <div className="relative w-full max-w-4xl mx-auto bg-gray-900 rounded-3xl overflow-hidden shadow-2xl border border-gray-200">
-              <div className="aspect-[11/8] relative">
+              <div 
+                className="aspect-[11/8] relative cursor-pointer"
+                onClick={() => {
+                  if (videoError || !isVideoLoaded) {
+                    window.location.href = '/demovideo'
+                  }
+                }}
+              >
                 {/* Video */}
                 {!videoError && (
                   <video
@@ -251,7 +258,7 @@ Connect your systems. Ship a secure chatbot. Measurable results as you scale.
                       </p>
                       {videoError && (
                         <button 
-                          onClick={() => window.open('https://github.com/scalewizeai/scalewize-website/blob/main/public/chatbot_demo_video.mov', '_blank')}
+                          onClick={() => window.location.href = '/demovideo'}
                           className="mt-6 px-8 py-3 rounded-xl text-white font-medium transition-colors hover:opacity-80"
                           style={{ backgroundColor: '#595F39' }}
                         >
