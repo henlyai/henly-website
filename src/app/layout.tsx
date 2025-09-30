@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "Henly AI",
     images: [
       {
-        url: "/henly_ai_logo.png",
+        url: "https://henly.ai/henly_ai_logo.png",
         width: 1200,
         height: 630,
         alt: "Henly AI - Enterprise AI Automation Platform",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Henly AI - Enterprise AI Automation Platform",
     description: "Transform your business with secure AI agents and chatbots. Custom enterprise solutions that integrate seamlessly with your existing systems and workflows.",
-    images: ["/henly_ai_logo.png"],
+    images: ["https://henly.ai/henly_ai_logo.png"],
     creator: "@henlyai",
   },
   robots: {
@@ -77,6 +77,11 @@ export default function RootLayout({
         <link rel="canonical" href="https://henly.ai" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#595F39" />
+        <meta property="og:image" content="https://henly.ai/henly_ai_logo.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/png" />
+        <meta name="twitter:image" content="https://henly.ai/henly_ai_logo.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
