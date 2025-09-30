@@ -27,20 +27,7 @@ export default function ChatbotPage() {
         const libreChatBaseUrl = process.env.NEXT_PUBLIC_LIBRECHAT_URL || 'https://scalewize-production-chatbot-production.up.railway.app'
         console.log('Attempting LibreChat connection to:', libreChatBaseUrl)
         
-        // First, try to setup default content for the organization (idempotent operation)
-        try {
-          await fetch(`${libreChatBaseUrl}/api/marketplace/setup`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
-            },
-          });
-          console.log('Default content setup completed (or already exists)');
-        } catch (setupError) {
-          console.log('Default content setup skipped:', setupError.message);
-        }
+        // Note: Default content will be auto-provisioned by LibreChat when user first accesses agents/prompts
         
         const res = await fetch(`${libreChatBaseUrl}/api/auth/sso/librechat`, {
           method: 'POST',
@@ -101,7 +88,7 @@ export default function ChatbotPage() {
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <Loader2 style={{ color: "#595F39" }} />
+                <Loader2 className="animate-spin h-8 w-8 mx-auto mb-4" style={{ color: "#595F39" }} />
                 <p className="text-gray-800">Connecting to chat service...</p>
               </div>
             </div>
