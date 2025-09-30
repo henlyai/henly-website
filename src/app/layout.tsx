@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "Henly AI",
     images: [
       {
-        url: "/henly_ai_cover_logo.png",
+        url: "/henly_ai_logo.png",
         width: 1200,
         height: 630,
         alt: "Henly AI - Enterprise AI Automation Platform",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Henly AI - Enterprise AI Automation Platform",
     description: "Transform your business with secure AI agents and chatbots. Custom enterprise solutions that integrate seamlessly with your existing systems and workflows.",
-    images: ["/henly_ai_cover_logo.png"],
+    images: ["/henly_ai_logo.png"],
     creator: "@henlyai",
   },
   robots: {
