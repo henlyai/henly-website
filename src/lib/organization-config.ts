@@ -106,65 +106,75 @@ export class OrganizationConfigManager {
 
   /**
    * Get default LibreChat configuration based on plan type
+   * All plans have access to all models and features
+   * Only token limits differentiate the plans
    */
   getDefaultConfig(planType: string): LibreChatConfig {
+    // All models available to all plans
+    const allModels = [
+      'gpt-3.5-turbo',
+      'gpt-4',
+      'gpt-4-turbo',
+      'gpt-4o',
+      'gpt-4o-mini',
+      'claude-3-sonnet',
+      'claude-3-opus',
+      'claude-3-haiku',
+      'claude-3.5-sonnet',
+      'gemini-pro',
+      'gemini-pro-vision',
+      'o1-preview',
+      'o1-mini'
+    ]
+
+    // All features enabled for all plans
+    const allFeatures = {
+      file_upload: true,
+      image_generation: true,
+      voice_chat: true,
+      code_interpreter: true,
+      web_search: true,
+      agents: true,
+      prompts: true,
+      mcp_servers: true,
+      knowledge_bases: true
+    }
+
+    // Base configuration with all models and features
     const baseConfig: LibreChatConfig = {
-      enabled_models: ['gpt-3.5-turbo'],
-      max_tokens: 10000,
+      enabled_models: allModels,
       knowledge_bases: [],
       mcp_servers: [],
       custom_instructions: 'You are a helpful AI assistant for this organization.',
       allowed_endpoints: ['/api/chat'],
-      features: {
-        file_upload: false,
-        image_generation: false,
-        voice_chat: false,
-        code_interpreter: false
-      }
+      features: allFeatures
     }
 
+    // Only token limits differentiate the plans
     switch (planType) {
       case 'starter':
         return {
           ...baseConfig,
-          enabled_models: ['gpt-3.5-turbo'],
-          max_tokens: 10000,
-          features: {
-            file_upload: true,
-            image_generation: false,
-            voice_chat: false,
-            code_interpreter: false
-          }
+          max_tokens: 100000 // 100K tokens per month
         }
 
       case 'professional':
         return {
           ...baseConfig,
-          enabled_models: ['gpt-3.5-turbo', 'gpt-4', 'claude-3-sonnet'],
-          max_tokens: 100000,
-          features: {
-            file_upload: true,
-            image_generation: true,
-            voice_chat: false,
-            code_interpreter: true
-          }
+          max_tokens: 1000000 // 1M tokens per month
         }
 
       case 'enterprise':
         return {
           ...baseConfig,
-          enabled_models: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'claude-3-sonnet', 'claude-3-opus'],
-          max_tokens: 1000000,
-          features: {
-            file_upload: true,
-            image_generation: true,
-            voice_chat: true,
-            code_interpreter: true
-          }
+          max_tokens: 10000000 // 10M tokens per month
         }
 
       default:
-        return baseConfig
+        return {
+          ...baseConfig,
+          max_tokens: 100000 // Default to starter plan
+        }
     }
   }
 
